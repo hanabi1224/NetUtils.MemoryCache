@@ -1,20 +1,27 @@
 ﻿namespace NetUtils.MemoryCache.Utils
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     public class LazyDisposable<T> : Lazy<T>, IDisposable
     {
+        [ExcludeFromCodeCoverage]
         public LazyDisposable() : base() { }
 
+        [ExcludeFromCodeCoverage]
         public LazyDisposable(bool isThreadSafe) : base(isThreadSafe) { }
 
+        [ExcludeFromCodeCoverage]
         public LazyDisposable(LazyThreadSafetyMode mode) : base(mode) { }
 
+        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory) : base(valueFactory) { }
 
+        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory, bool isThreadSafe) : base(valueFactory, isThreadSafe) { }
 
+        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory, LazyThreadSafetyMode mode) : base(valueFactory, mode) { }
 
         ~LazyDisposable()

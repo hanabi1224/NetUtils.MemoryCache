@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -17,45 +16,49 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCacheFuntionConcurrency(bool useStrictThreadSafeMode, int numberOfConcurrentTasks)
         {
             var key = Guid.NewGuid().ToString();
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency), CacheExpirePolicy.ExpireOnLastUpdate);
+            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
             cache.UseStrictThreadSafeMode = useStrictThreadSafeMode;
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {
-                cache.GetDataOrCreate(key, () =>
-                {
-                    Thread.Sleep(RandomUtil.Random.Next(900) + 100);
-                    Interlocked.Increment(ref counter);
-                    return i;
-                }, TimeSpan.FromDays(1)).Should().BeGreaterOrEqualTo(0);
+                cache.GetAutoReloadDataWithInterval(
+                    key,
+                    () =>
+                    {
+                        Thread.Sleep(RandomUtil.Random.Next(900) + 100);
+                        Interlocked.Increment(ref counter);
+                        return i;
+                    },
+                    TimeSpan.FromDays(1),
+                    TimeSpan.FromHours(1));
             });
 
             counter.Should().Be(1);
         }
 
-        [Test]
-        public async Task TestCacheAsyncFuntionConcurrency()
-        {
-            var key = Guid.NewGuid().ToString();
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheAsyncFuntionConcurrency), CacheExpirePolicy.ExpireOnLastUpdate);
+        ////[Test]
+        ////public async Task TestCacheAsyncFuntionConcurrency()
+        ////{
+        ////    var key = Guid.NewGuid().ToString();
+        ////    var cache = MemoryCache.GetNamedInstance(nameof(TestCacheAsyncFuntionConcurrency));
 
-            var counter = 0;
-            var tasks = new List<Task>();
-            for (var i = 0; i < 100; i++)
-            {
-                var t = cache.GetDataOrCreateAsync(key, async () =>
-                {
-                    await Task.Delay(RandomUtil.Random.Next(900) + 100);
-                    Interlocked.Increment(ref counter);
-                    return i;
-                }, TimeSpan.FromDays(1)).ContinueWith(async _ => (await _.ConfigureAwait(false)).Should().BeGreaterOrEqualTo(0));
+        ////    var counter = 0;
+        ////    var tasks = new List<Task>();
+        ////    for (var i = 0; i < 100; i++)
+        ////    {
+        ////        var t = cache.GetDataOrCreateAsync(key, async () =>
+        ////        {
+        ////            await Task.Delay(RandomUtil.Random.Next(900) + 100);
+        ////            Interlocked.Increment(ref counter);
+        ////            return i;
+        ////        }, TimeSpan.FromDays(1)).ContinueWith(async _ => (await _.ConfigureAwait(false)).Should().BeGreaterOrEqualTo(0));
 
-                tasks.Add(t);
-            }
+        ////        tasks.Add(t);
+        ////    }
 
-            await Task.WhenAll(tasks);
+        ////    await Task.WhenAll(tasks);
 
-            counter.Should().Be(1);
-        }
+        ////    counter.Should().Be(1);
+        ////}
     }
 }

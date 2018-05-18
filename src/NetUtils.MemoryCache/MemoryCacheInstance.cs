@@ -11,28 +11,23 @@
     internal class MemoryCacheInstance : DisposableBase, ICacheInstance
     {
         private readonly ConcurrentDictionary<string, CacheItem> _keyDataMappings = new ConcurrentDictionary<string, CacheItem>();
+        private readonly ConcurrentQueue<IDisposable> _itemsToDispose = new ConcurrentQueue<IDisposable>();
 
         private readonly ReaderWriterLockSlim _lockForClean = new ReaderWriterLockSlim();
-        private readonly ReaderWriterLockSlim _lockForLazyData = new ReaderWriterLockSlim();
+        private readonly Lazy<ReaderWriterLockSlim> _lockForLazyData = LazyUtils.ToLazy(() => new ReaderWriterLockSlim());
 
         private DateTimeOffset _lastClean = DateTimeOffset.MinValue;
 
         public static readonly TimeSpan DefaultCacheCleanInternal = TimeSpan.FromMinutes(5);
-        public static readonly TimeSpan DefaultDataDisposeDelay = TimeSpan.FromMinutes(30);
 
-        public MemoryCacheInstance(string name, CacheExpirePolicy cacheExpirePolicy)
+        public MemoryCacheInstance(string name)
         {
             Name = name ?? throw new ArgumentNullException(nameof(name));
-            CacheExpirePolicy = cacheExpirePolicy;
         }
 
         public string Name { get; }
 
-        public CacheExpirePolicy CacheExpirePolicy { get; }
-
         public TimeSpan CleanInternal { get; set; } = DefaultCacheCleanInternal;
-
-        public TimeSpan DataDisposeDelay { get; set; } = DefaultDataDisposeDelay;
 
         public bool UseStrictThreadSafeMode { get; set; } = false;
 
@@ -47,18 +42,26 @@
                     var utcNow = DateTimeOffset.UtcNow;
                     if (utcNow < _lastClean + CleanInternal)
                     {
-                        // Cannot add / delete while iterating a list / dict directly
-                        var keysToRemove = _keyDataMappings.Where(pair => pair.Value.GetExpireUtc(CacheExpirePolicy) < utcNow).Select(pair => pair.Key).ToList();
-                        if (keysToRemove?.Count > 0)
+                        return;
+                    }
+
+                    // Cannot add / delete while iterating a list / dict directly
+                    var keysToRemove = _keyDataMappings.Where(pair => pair.Value.IsExpired).Select(pair => pair.Key).ToList();
+                    if (keysToRemove?.Count > 0)
+                    {
+                        foreach (var key in keysToRemove)
                         {
-                            foreach (var key in keysToRemove)
-                            {
-                                TryDeleteKey(key);
-                            }
+                            TryDeleteKey(key);
                         }
                     }
 
+                    while (_itemsToDispose.TryDequeue(out var cacheItem))
+                    {
+                        cacheItem.Dispose();
+                    }
+
                     _lastClean = utcNow;
+
                 }
                 catch (Exception e)
                 {
@@ -80,133 +83,172 @@
             }
         }
 
-        public T GetDataOrCreate<T>(string key, Func<T> constructor, TimeSpan timeout, string metadata = null, bool shouldReloadInBackground = true)
+        public T GetAutoReloadDataWithCache<T>(
+            string key,
+            Func<T> dataFactory,
+            Func<string> eTagFactory,
+            TimeSpan timeToLive,
+            TimeSpan dataUpdateDetectInternal,
+            bool shouldReloadInBackground = true)
         {
-            return GetLazyDataOrCreate(key, constructor, timeout, metadata, shouldReloadInBackground).Value;
+            var cacheItem = GetAutoReloadDataWithCacheInner<T>(
+                key,
+                dataFactory,
+                eTagFactory,
+                timeToLive,
+                dataUpdateDetectInternal,
+                shouldReloadInBackground);
+
+            var val = cacheItem.Data as Lazy<T>;
+            return val.Value;
         }
 
-        public Task<T> GetDataOrCreateAsync<T>(string key, Func<Task<T>> constructor, TimeSpan timeout, string metadata = null, bool shouldReloadInBackground = true)
+        private ICacheItem GetAutoReloadDataWithCacheInner<T>(
+            string key,
+            Func<T> dataFactory,
+            Func<string> eTagFactory,
+            TimeSpan timeToLive,
+            TimeSpan dataUpdateDetectInternal,
+            bool shouldReloadInBackground)
         {
-            var lazyData = GetLazyDataOrCreateFromTask(key, constructor, timeout, metadata, shouldReloadInBackground);
-            return Task.FromResult(lazyData.Value);
-        }
+            if (TryGetDataInner(key, out var cacheItem)
+                && shouldReloadInBackground)
+            {
+                var isUpdateProbobalyNeeded = cacheItem.LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) < DateTimeOffset.UtcNow;
+                if (isUpdateProbobalyNeeded)
+                {
+                    Task.Run(() =>
+                    {
+                        SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: false);
+                    });
+                }
 
-        private Lazy<T> GetLazyDataOrCreate<T>(string key, Func<T> constructor, TimeSpan timeout, string metadata, bool shouldReloadInBackground)
-        {
+                return cacheItem;
+            }
+
             if (UseStrictThreadSafeMode)
             {
-                _lockForLazyData.EnterWriteLock();
+                _lockForLazyData.Value.EnterWriteLock();
+                TryGetDataInner(key, out cacheItem);
             }
 
             try
             {
-                var lazy = LazyUtils.ToLazy(constructor);
-                var cacheItem = GetDataOrCreateCacheItem(key, () => lazy, timeout, metadata, shouldReloadInBackground);
-                if (cacheItem != null)
-                {
-                    var val = cacheItem.Data as Lazy<T>;
-                    if (val == null && cacheItem.Data is T)
-                    {
-                        val = LazyUtils.ToLazy(() => (T)cacheItem.Data);
-                    }
-
-                    return val;
-                }
-                else
-                {
-                    return LazyUtils.ToLazy(() => default(T));
-                }
+                return SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: true);
             }
             finally
             {
                 if (UseStrictThreadSafeMode)
                 {
-                    _lockForLazyData.ExitWriteLock();
+                    _lockForLazyData.Value.ExitWriteLock();
                 }
             }
         }
 
-        private Lazy<T> GetLazyDataOrCreateFromTask<T>(string key, Func<Task<T>> constructor, TimeSpan timeout, string metadata, bool shouldReloadInBackground)
+        private CacheItem SetOrUpdateLazyData<T>(
+            string key,
+            CacheItem oldCacheItem,
+            Lazy<T> dataFactory,
+            Lazy<string> eTagFactory,
+            TimeSpan timeToLive,
+            TimeSpan dataUpdateDetectInternal,
+            bool shouldWaitForLock)
         {
-            var lazy = GetLazyDataOrCreate(key, () => constructor().ConfigureAwait(false).GetAwaiter().GetResult(), timeout, metadata, shouldReloadInBackground);
-            return lazy;
+            var isUpdateNeeded = oldCacheItem == null || oldCacheItem.IsUpdateNeeded(eTagFactory, dataUpdateDetectInternal, shouldWaitForLock);
+            if (!isUpdateNeeded)
+            {
+                return oldCacheItem;
+            }
+
+            return AddOrUpdate(key, dataFactory, timeToLive, eTagFactory?.Value);
         }
 
-        private ICacheItem GetDataOrCreateCacheItem<T>(string key, Func<T> constructor, TimeSpan timeToLive, string metadata, bool shouldReloadInBackground)
+        public T GetData<T>(string key)
         {
-            CacheItem cacheItem;
-            if (shouldReloadInBackground)
+            if (TryGetDataInner(key, out var cacheItem))
             {
-                if (TryGetDataInner(key, false, out cacheItem))
+                try
                 {
-                    if (cacheItem.GetExpireUtc(CacheExpirePolicy) < DateTimeOffset.UtcNow)
-                    {
-                        Task.Run(() => TrySetData(key, () => constructor(), timeToLive, metadata));
-                    }
-                    else
-                    {
-                        cacheItem.LastAccessUtc = DateTimeOffset.UtcNow;
-                    }
-
-                    return cacheItem;
+                    return (T)cacheItem.Data;
                 }
-            }
-            else
-            {
-                if (TryGetDataInner(key, true, out cacheItem))
+                catch (InvalidCastException e)
                 {
-                    return cacheItem;
+                    Trace.TraceError(e.ToString());
+                    return default(T);
                 }
             }
 
-            TrySetData(key, () => constructor(), timeToLive, metadata);
-            if (TryGetDataInner(key, true, out cacheItem))
+            return default(T);
+        }
+
+        public object GetData(string key)
+        {
+            if (TryGetDataInner(key, out var cacheItem) && cacheItem != null)
             {
-                return cacheItem;
+                return cacheItem.Data;
             }
 
             return null;
         }
 
-        public bool TryGetData(string key, out ICacheItem cacheItem)
+        public bool TryDeleteKey(string key)
         {
-            if (TryGetDataInner(key, true, out var data))
+            if (_keyDataMappings.TryRemove(key, out var item))
             {
-                cacheItem = data;
+                if (item.IsDataDisposable)
+                {
+                    _itemsToDispose.Enqueue(item);
+                }
+
                 return true;
             }
 
-            cacheItem = null;
             return false;
         }
 
-        private bool TryGetDataInner(string key, bool shouldCheckDataExpire, out CacheItem cacheItem)
+        public void SetData(string key, object data, TimeSpan timeToLive, string eTag = null)
+        {
+            AddOrUpdate(key, data, timeToLive, eTag);
+        }
+
+        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
+        {
+            return _keyDataMappings.AddOrUpdate(
+                key,
+                k => new CacheItem(key, data, eTag, timeToLive),
+                (k, c) =>
+                {
+                    if (c.IsUpdateNeeded(eTag))
+                    {
+                        if (c.IsDataDisposable)
+                        {
+                            _itemsToDispose.Enqueue(c);
+                        }
+
+                        return new CacheItem(k, data, eTag, timeToLive);
+                    }
+
+                    c.LastAccessUtc = DateTimeOffset.UtcNow;
+                    c.TimeToLive = timeToLive;
+
+                    return c;
+                });
+        }
+
+        internal bool TryGetDataInner(string key, out CacheItem cacheItem)
         {
             var success = false;
             cacheItem = null;
 
-            try
-            {
-                success = _keyDataMappings.TryGetValue(key, out cacheItem);
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.ToString());
-            }
-
+            success = _keyDataMappings.TryGetValue(key, out cacheItem) && cacheItem != null;
             if (!success)
             {
                 return false;
             }
 
-            if (cacheItem != null
-                && (!shouldCheckDataExpire || cacheItem.GetExpireUtc(CacheExpirePolicy) > DateTimeOffset.UtcNow))
+            if (!cacheItem.IsExpired)
             {
-                if (shouldCheckDataExpire)
-                {
-                    cacheItem.LastAccessUtc = DateTimeOffset.UtcNow;
-                }
-
+                cacheItem.LastAccessUtc = DateTimeOffset.UtcNow;
                 return true;
             }
 
@@ -214,73 +256,10 @@
             return false;
         }
 
-        public bool TryDeleteKey(string key)
-        {
-            try
-            {
-                if (_keyDataMappings.TryRemove(key, out var item))
-                {
-                    if (item.IsDataDisposable || DataDisposeDelay >= TimeSpan.FromMilliseconds(1))
-                    {
-                        Task.Run(async () =>
-                        {
-                            await Task.Delay(DataDisposeDelay).ConfigureAwait(false);
-                            item.Dispose();
-                        });
-                    }
-                    else
-                    {
-                        item.Dispose();
-                    }
-
-                    return true;
-                }
-
-                return false;
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.ToString());
-            }
-
-            return false;
-        }
-
-        public bool TrySetData(string key, object data, TimeSpan timeToLive, string metadata = null)
-        {
-            return TrySetData(key, () => data, timeToLive, metadata);
-        }
-
-        private bool TrySetData(string key, Func<object> dataConstructor, TimeSpan timeToLive, string metadata)
-        {
-            try
-            {
-                var data = dataConstructor();
-                var cacheItem = _keyDataMappings.AddOrUpdate(
-                    key,
-                    k => new CacheItem(key, data, metadata),
-                    (k, c) =>
-                    {
-                        c.Data = data;
-                        c.MetaData = metadata;
-                        return c;
-                    });
-
-                cacheItem.LastUpdateUtc = cacheItem.LastAccessUtc = DateTimeOffset.UtcNow;
-                cacheItem.TimeToLive = timeToLive;
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError(e.ToString());
-            }
-
-            return false;
-        }
-
         protected override void DisposeResources()
         {
+            //// Add lock here
+
             foreach (var pair in _keyDataMappings)
             {
                 pair.Value?.Dispose();
@@ -288,8 +267,8 @@
 
             _keyDataMappings.Clear();
 
-            _lockForClean?.Dispose();
-            _lockForLazyData?.Dispose();
+            _lockForClean.Dispose();
+            (_lockForLazyData as IDisposable).Dispose();
         }
     }
 }

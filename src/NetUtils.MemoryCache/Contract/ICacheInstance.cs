@@ -1,31 +1,32 @@
 ﻿namespace NetUtils.MemoryCache
 {
     using System;
-    using System.Threading.Tasks;
 
     public interface ICacheInstance : IDisposable
     {
         string Name { get; }
 
-        CacheExpirePolicy CacheExpirePolicy { get; }
-
         TimeSpan CleanInternal { get; set; }
-
-        TimeSpan DataDisposeDelay { get; set; }
 
         bool UseStrictThreadSafeMode { get; set; }
 
         int Size { get; }
 
-        bool TryGetData(string key, out ICacheItem cacheItem);
+        T GetAutoReloadDataWithCache<T>(
+            string key,
+            Func<T> dataFactory,
+            Func<string> eTagFactory,
+            TimeSpan timeToLive,
+            TimeSpan dataUpdateDetectInternal,
+            bool shouldReloadInBackground = true);
 
-        bool TrySetData(string key, object data, TimeSpan timeToLive, string metadata = null);
+        void SetData(string key, object data, TimeSpan timeToLive, string eTag = null);
 
         bool TryDeleteKey(string key);
 
-        T GetDataOrCreate<T>(string key, Func<T> constructor, TimeSpan timeout, string metadata = null, bool shouldReloadInBackground = true);
+        T GetData<T>(string key);
 
-        Task<T> GetDataOrCreateAsync<T>(string key, Func<Task<T>> constructor, TimeSpan timeout, string metadata = null, bool shouldReloadInBackground = true);
+        object GetData(string key);
 
         void Clear();
 
