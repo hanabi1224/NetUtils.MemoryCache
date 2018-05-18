@@ -2,7 +2,7 @@
 
 namespace NetUtils.MemoryCache
 {
-    public interface ICacheItem
+    internal interface ICacheItem
     {
         string Key { get; }
 
@@ -10,14 +10,12 @@ namespace NetUtils.MemoryCache
 
         bool IsDataDisposable { get; }
 
-        string MetaData { get; }
-
-        DateTimeOffset LastUpdateUtc { get; }
+        string ETag { get; }
 
         DateTimeOffset LastAccessUtc { get; }
 
         TimeSpan TimeToLive { get; }
 
-        DateTimeOffset GetExpireUtc(CacheExpirePolicy cacheExpirePolicy);
+        bool IsExpired { get; }
     }
 }

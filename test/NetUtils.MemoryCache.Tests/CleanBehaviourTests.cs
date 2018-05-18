@@ -13,25 +13,29 @@ namespace NetUtils.MemoryCache.Tests
         [TestCase(false)]
         public async Task TestCacheCleanBehaviour(bool shouldReloadInBackground)
         {
-            MemoryCache.CacheCleanCheckInternal = TimeSpan.FromMilliseconds(200);
-
             var cacheName = $"{nameof(TestCacheCleanBehaviour)}|{shouldReloadInBackground}";
-            var cache = MemoryCache.GetNamedInstance(cacheName, CacheExpirePolicy.ExpireOnLastUpdate);
+            var cache = MemoryCache.GetNamedInstance(cacheName);
 
-            cache.CleanInternal = TimeSpan.FromSeconds(1);
+            cache.CleanInternal = TimeSpan.FromMilliseconds(200);
+
             cache.Size.Should().Be(0);
-            ExpireBehaviourTests.GetOrCreate(cache, Guid.NewGuid().ToString(), TimeSpan.FromMilliseconds(300), shouldReloadInBackground: shouldReloadInBackground);
+            GetOrCreate(cache, Guid.NewGuid().ToString(), TimeSpan.FromMilliseconds(200), shouldReloadInBackground: shouldReloadInBackground);
             cache.Size.Should().Be(1);
-            ExpireBehaviourTests.GetOrCreate(cache, Guid.NewGuid().ToString(), TimeSpan.FromMilliseconds(1300), shouldReloadInBackground: shouldReloadInBackground);
+            GetOrCreate(cache, Guid.NewGuid().ToString(), TimeSpan.FromMilliseconds(500), shouldReloadInBackground: shouldReloadInBackground);
             cache.Size.Should().Be(2);
-            await Task.Delay(TimeSpan.FromMilliseconds(1300));
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            cache.Size.Should().Be(2);
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
             cache.Size.Should().Be(1);
-            await Task.Delay(TimeSpan.FromMilliseconds(1300));
+            await Task.Delay(TimeSpan.FromMilliseconds(400));
             cache.Size.Should().Be(0);
 
             MemoryCache.TryDeleteNamedInstance(cacheName).Should().BeTrue();
+        }
 
-            MemoryCache.CacheCleanCheckInternal = MemoryCache.DefaultCacheCleanCheckInternal;
+        private static void GetOrCreate(ICacheInstance cache, string key, TimeSpan timeToLive, bool shouldReloadInBackground)
+        {
+            cache.GetAutoReloadDataWithInterval(key, () => new object(), timeToLive, TimeSpan.MaxValue, shouldReloadInBackground: shouldReloadInBackground);
         }
     }
 }

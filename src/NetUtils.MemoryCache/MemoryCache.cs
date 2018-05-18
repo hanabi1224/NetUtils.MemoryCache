@@ -34,13 +34,15 @@ namespace NetUtils.MemoryCache
 
         public static ICacheInstance DefaultInstance { get; } = GetNamedInstance(nameof(DefaultInstance));
 
-        public static ICacheInstance GetNamedInstance(string name, CacheExpirePolicy cacheExpirePolicy = CacheExpirePolicy.ExpireOnLastAccess)
+        public static ICacheInstance GetNamedInstance(string name)
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            return _namedCacheInstances.GetOrAdd(
+            var result = _namedCacheInstances.GetOrAdd(
                 name,
-                key => new MemoryCacheInstance(name, cacheExpirePolicy));
+                key => new MemoryCacheInstance(name));
+
+            return result;
         }
 
         public static bool TryDeleteNamedInstance(string name)
@@ -49,7 +51,10 @@ namespace NetUtils.MemoryCache
 
             if (_namedCacheInstances.TryRemove(name, out var cacheInstance))
             {
-                return true;
+                using (cacheInstance)
+                {
+                    return true;
+                }
             }
 
             return false;

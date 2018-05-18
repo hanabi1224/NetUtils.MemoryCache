@@ -7,51 +7,106 @@
 
     internal class CacheItem : DisposableBase, ICacheItem
     {
-        public CacheItem(string key, object data, string metadata)
+        private readonly object _lock = new object();
+
+        public CacheItem(string key, object data, string eTag, TimeSpan timeToLive)
         {
             this.Key = key;
             this.Data = data;
-            this.MetaData = metadata;
+            this.ETag = eTag;
+            this.TimeToLive = timeToLive;
+
+            LastAccessUtc = LastETagCheckUtc = DateTimeOffset.UtcNow;
+            IsDataDisposable = Data is IDisposable;
         }
 
-        public string Key { get; set; }
+        public string Key { get; }
 
-        public object Data { get; set; }
+        public object Data { get; }
 
-        public bool IsDataDisposable => Data is IDisposable;
+        public bool IsDataDisposable { get; }
 
-        public string MetaData { get; set; }
-
-        public DateTimeOffset LastUpdateUtc { get; set; }
+        public string ETag { get; }
 
         public DateTimeOffset LastAccessUtc { get; set; }
 
+        public DateTimeOffset LastETagCheckUtc { get; private set; }
+
         public TimeSpan TimeToLive { get; set; }
 
-        public DateTimeOffset GetExpireUtc(CacheExpirePolicy cacheExpirePolicy)
+        public bool IsExpired
         {
-            if (TimeToLive == TimeSpan.MaxValue
-                || TimeToLive == Timeout.InfiniteTimeSpan)
+            get
             {
-                return DateTimeOffset.MaxValue;
+                if (TimeToLive == TimeSpan.MaxValue
+                || TimeToLive == Timeout.InfiniteTimeSpan)
+                {
+                    return false;
+                }
+                else
+                {
+                    try
+                    {
+                        return LastAccessUtc + TimeToLive < DateTimeOffset.UtcNow;
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError(e.ToString());
+                        return false;
+                    }
+                }
+            }
+        }
+
+        public bool IsUpdateNeeded(string newETag)
+        {
+            return !(ETag == newETag && newETag != null);
+        }
+
+        public bool IsUpdateNeeded(Lazy<string> newETagFactory, TimeSpan dataUpdateDetectInternal, bool shouldWaitForLock)
+        {
+            bool lockAquired = false;
+            if (shouldWaitForLock)
+            {
+                Monitor.Enter(_lock);
+                lockAquired = true;
             }
             else
             {
+                lockAquired = Monitor.TryEnter(_lock);
+            }
+
+            if (lockAquired)
+            {
                 try
                 {
-                    return (cacheExpirePolicy == CacheExpirePolicy.ExpireOnLastUpdate ? LastUpdateUtc : LastAccessUtc) + TimeToLive;
+                    if (LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) > DateTimeOffset.UtcNow)
+                    {
+                        return false;
+                    }
+
+                    LastETagCheckUtc = DateTimeOffset.UtcNow;
+                    return IsUpdateNeeded(newETagFactory?.Value);
                 }
                 catch (Exception e)
                 {
                     Trace.TraceError(e.ToString());
-                    return DateTimeOffset.MaxValue;
+                }
+                finally
+                {
+                    Monitor.Exit(_lock);
                 }
             }
+
+            return false;
         }
 
         protected override void DisposeResources()
         {
-            (Data as IDisposable)?.Dispose();
+            if (IsDataDisposable)
+            {
+                (Data as IDisposable).Dispose();
+            }
         }
     }
 }
