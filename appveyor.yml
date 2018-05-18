@@ -1,7 +1,8 @@
 version: 1.0.{build}
 image: Visual Studio 2017
+skip_branch_with_pr: true
 configuration: Release
 before_build:
-- cmd: msbuild /t:restore
+- cmd: msbuild /m /t:restore
 build:
   verbosity: minimal
