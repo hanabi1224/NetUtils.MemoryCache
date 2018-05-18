@@ -18,6 +18,7 @@
             Func<string> eTagFactory,
             TimeSpan timeToLive,
             TimeSpan dataUpdateDetectInternal,
+            out string eTag,
             bool shouldReloadInBackground = true);
 
         void SetData(string key, object data, TimeSpan timeToLive, string eTag = null);

@@ -89,6 +89,7 @@
             Func<string> eTagFactory,
             TimeSpan timeToLive,
             TimeSpan dataUpdateDetectInternal,
+            out string eTag,
             bool shouldReloadInBackground = true)
         {
             var cacheItem = GetAutoReloadDataWithCacheInner<T>(
@@ -100,6 +101,7 @@
                 shouldReloadInBackground);
 
             var val = cacheItem.Data as Lazy<T>;
+            eTag = cacheItem.ETag;
             return val.Value;
         }
 

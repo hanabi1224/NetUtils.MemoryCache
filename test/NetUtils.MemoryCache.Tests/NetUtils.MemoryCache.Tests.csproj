@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+  
+  <ItemGroup>
     <ProjectReference Include="..\..\src\NetUtils.MemoryCache\NetUtils.MemoryCache.csproj" />
   </ItemGroup>
 

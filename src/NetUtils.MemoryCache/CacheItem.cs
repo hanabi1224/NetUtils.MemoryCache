@@ -9,9 +9,10 @@
     {
         private readonly object _lock = new object();
 
+        private readonly WeakReference<string> _key;
         public CacheItem(string key, object data, string eTag, TimeSpan timeToLive)
         {
-            this.Key = key;
+            _key = new WeakReference<string>(key);
             this.Data = data;
             this.ETag = eTag;
             this.TimeToLive = timeToLive;
@@ -20,7 +21,18 @@
             IsDataDisposable = Data is IDisposable;
         }
 
-        public string Key { get; }
+        public string Key
+        {
+            get
+            {
+                if (_key.TryGetTarget(out var target))
+                {
+                    return target;
+                }
+
+                return null;
+            }
+        }
 
         public object Data { get; }
 
