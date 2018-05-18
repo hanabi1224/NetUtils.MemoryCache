@@ -23,6 +23,24 @@
                 shouldReloadInBackground: shouldReloadInBackground);
         }
 
+        public static T GetAutoReloadDataWithInterval<T>(
+            this ICacheInstance cache,
+            string key,
+            Func<Task<T>> dataFactory,
+            TimeSpan timeToLive,
+            TimeSpan dataReloadInternal,
+            bool shouldReloadInBackground = true)
+        {
+            return cache.GetAutoReloadDataWithCache<T>(
+                key: key,
+                dataFactory: dataFactory,
+                eTagFactory: null,
+                timeToLive: timeToLive,
+                dataUpdateDetectInternal: dataReloadInternal,
+                eTag: out _,
+                shouldReloadInBackground: shouldReloadInBackground);
+        }
+
         public static T GetAutoReloadDataWithCache<T>(
             this ICacheInstance cache,
             string key,
@@ -34,7 +52,7 @@
             bool shouldReloadInBackground = true)
         {
             Func<T> df = () => dataFactory().ConfigureAwait(false).GetAwaiter().GetResult();
-            Func<string> ef = () => eTagFactory().ConfigureAwait(false).GetAwaiter().GetResult();
+            Func<string> ef = () => eTagFactory?.Invoke().ConfigureAwait(false).GetAwaiter().GetResult();
             return cache.GetAutoReloadDataWithCache<T>(
                 key: key,
                 dataFactory: df,
