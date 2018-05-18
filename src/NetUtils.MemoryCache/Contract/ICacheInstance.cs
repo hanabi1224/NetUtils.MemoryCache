@@ -8,7 +8,7 @@
 
         TimeSpan CleanInternal { get; set; }
 
-        bool UseStrictThreadSafeMode { get; set; }
+        bool UseStrictThreadSafeModeForAutoReload { get; set; }
 
         int Size { get; }
 

@@ -17,7 +17,7 @@ namespace NetUtils.MemoryCache.Tests
         {
             var key = Guid.NewGuid().ToString();
             var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
-            cache.UseStrictThreadSafeMode = useStrictThreadSafeMode;
+            cache.UseStrictThreadSafeModeForAutoReload = useStrictThreadSafeMode;
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {
