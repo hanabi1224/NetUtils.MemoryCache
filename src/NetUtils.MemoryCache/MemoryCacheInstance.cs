@@ -29,7 +29,7 @@
 
         public TimeSpan CleanInternal { get; set; } = DefaultCacheCleanInternal;
 
-        public bool UseStrictThreadSafeMode { get; set; } = false;
+        public bool UseStrictThreadSafeModeForAutoReload { get; set; } = true;
 
         public int Size => _keyDataMappings.Count;
 
@@ -128,7 +128,7 @@
                 return cacheItem;
             }
 
-            if (UseStrictThreadSafeMode)
+            if (UseStrictThreadSafeModeForAutoReload)
             {
                 _lockForLazyData.Value.EnterWriteLock();
                 TryGetDataInner(key, out cacheItem);
@@ -140,7 +140,7 @@
             }
             finally
             {
-                if (UseStrictThreadSafeMode)
+                if (UseStrictThreadSafeModeForAutoReload)
                 {
                     _lockForLazyData.Value.ExitWriteLock();
                 }

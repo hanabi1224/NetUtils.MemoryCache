@@ -24,11 +24,11 @@
                 int counter1 = 0;
                 int counter2 = 0;
 
-                var lazyResponse = LazyUtils.ToLazy(() =>
+                var lazyResponse = LazyUtils.ToLazy(async () =>
                 {
                     Interlocked.Increment(ref counter1);
                     var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{etag}");
-                    return client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                    return await client.SendAsync(request).ConfigureAwait(false);
                 });
                 cache.GetAutoReloadDataWithCache(
                     baseUrl,
@@ -43,11 +43,11 @@
                 counter1.Should().Be(1);
                 counter2.Should().Be(1);
 
-                lazyResponse = LazyUtils.ToLazy(() =>
+                lazyResponse = LazyUtils.ToLazy(async () =>
                 {
                     Interlocked.Increment(ref counter1);
                     var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{etag}");
-                    return client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                    return await client.SendAsync(request).ConfigureAwait(false);
                 });
                 cache.GetAutoReloadDataWithCache(
                     baseUrl,
@@ -63,11 +63,11 @@
                 counter2.Should().Be(1);
 
                 await Task.Delay(150);
-                lazyResponse = LazyUtils.ToLazy(() =>
+                lazyResponse = LazyUtils.ToLazy(async () =>
                 {
                     Interlocked.Increment(ref counter1);
                     var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{etag}");
-                    return client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                    return await client.SendAsync(request).ConfigureAwait(false);
                 });
                 cache.GetAutoReloadDataWithCache(
                     baseUrl,
@@ -84,11 +84,11 @@
 
                 etag = Guid.NewGuid();
                 await Task.Delay(50);
-                lazyResponse = LazyUtils.ToLazy(() =>
+                lazyResponse = LazyUtils.ToLazy(async () =>
                 {
                     Interlocked.Increment(ref counter1);
                     var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{etag}");
-                    return client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                    return await client.SendAsync(request).ConfigureAwait(false);
                 });
                 cache.GetAutoReloadDataWithCache(
                     baseUrl,
@@ -104,11 +104,11 @@
                 counter2.Should().Be(1);
 
                 await Task.Delay(150);
-                lazyResponse = LazyUtils.ToLazy(() =>
+                lazyResponse = LazyUtils.ToLazy(async () =>
                 {
                     Interlocked.Increment(ref counter1);
                     var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{etag}");
-                    return client.SendAsync(request).ConfigureAwait(false).GetAwaiter().GetResult();
+                    return await client.SendAsync(request).ConfigureAwait(false);
                 });
                 cache.GetAutoReloadDataWithCache(
                     baseUrl,
