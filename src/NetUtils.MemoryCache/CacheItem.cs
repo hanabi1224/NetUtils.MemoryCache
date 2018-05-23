@@ -92,6 +92,11 @@
             {
                 try
                 {
+                    if (dataUpdateDetectInternal <= TimeSpan.Zero)
+                    {
+                        return true;
+                    }
+
                     if (LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) > DateTimeOffset.UtcNow)
                     {
                         return false;
