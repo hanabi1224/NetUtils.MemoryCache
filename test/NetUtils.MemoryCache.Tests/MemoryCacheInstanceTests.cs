@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NetUtils.MemoryCache.Utils;
 using NUnit.Framework;
 
 namespace NetUtils.MemoryCache.Tests
@@ -96,21 +97,35 @@ namespace NetUtils.MemoryCache.Tests
             var exceptionCount = 0;
             Func<int> exceptionFunc = () =>
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(RandomUtil.Random.Next(500) + 500);
                 Interlocked.Increment(ref exceptionCount);
                 throw new InvalidOperationException();
             };
 
-            await Task.Delay(101);
-            data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+            for (var i = 0; i < 5; i++)
+            {
+                await Task.Delay(110);
+                data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+                if (shouldReloadInBackground)
+                {
+                    await Task.Delay(10);
+                    data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+                }
+
+                data.Should().Be(8);
+                exceptionCount.Should().Be(i + 1);
+            }
+
+            await Task.Delay(110);
+            data = cache.GetAutoReloadDataWithInterval(key, () => 6, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             if (shouldReloadInBackground)
             {
                 await Task.Delay(10);
+                data.Should().Be(8);
                 data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             }
 
-            data.Should().Be(8);
-            exceptionCount.Should().Be(1);
+            data.Should().Be(6);
         }
 
         ////[Test]
