@@ -19,8 +19,11 @@
     <PackageTags>memory cache,cache,MemoryCache</PackageTags>
     <Version>1.0.0-pre3</Version>
   </PropertyGroup>
-    
+
   <ItemGroup>
+    <PackageReference Include="OpenCover" Version="4.6.519">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="SonarAnalyzer.CSharp" Version="7.1.0.5212">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
