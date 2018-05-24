@@ -34,17 +34,19 @@
             }
         }
 
-        public object Data { get; }
+        public object Data { get; set; }
 
         public bool IsDataDisposable { get; }
 
-        public string ETag { get; }
+        public string ETag { get; set; }
 
         public DateTimeOffset LastAccessUtc { get; set; }
 
         public DateTimeOffset LastETagCheckUtc { get; private set; }
 
         public TimeSpan TimeToLive { get; set; }
+
+        public CacheItem PreviousCacheItem { get; set; }
 
         public bool IsExpired
         {
@@ -123,6 +125,11 @@
             if (IsDataDisposable)
             {
                 (Data as IDisposable).Dispose();
+            }
+
+            if (PreviousCacheItem?.IsDataDisposable == true)
+            {
+                (PreviousCacheItem.Data as IDisposable).Dispose();
             }
         }
     }

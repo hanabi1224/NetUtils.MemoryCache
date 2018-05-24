@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
@@ -80,6 +81,36 @@ namespace NetUtils.MemoryCache.Tests
             await Task.Delay(TimeSpan.FromMilliseconds(300));
             cache.CleanIfNeeded();
             isDisposed.Should().BeTrue();
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public async Task TestAutoReloadOnException(bool shouldReloadInBackground)
+        {
+            var cache = MemoryCache.GetNamedInstance(nameof(TestAutoReloadOnException));
+            var key = Guid.NewGuid().ToString();
+            var data = cache.GetAutoReloadDataWithInterval(key, () => 8, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+            data.Should().Be(8);
+
+            var exceptionCount = 0;
+            Func<int> exceptionFunc = () =>
+            {
+                Thread.Sleep(1000);
+                Interlocked.Increment(ref exceptionCount);
+                throw new InvalidOperationException();
+            };
+
+            await Task.Delay(101);
+            data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+            if (shouldReloadInBackground)
+            {
+                await Task.Delay(10);
+                data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
+            }
+
+            data.Should().Be(8);
+            exceptionCount.Should().Be(1);
         }
 
         ////[Test]

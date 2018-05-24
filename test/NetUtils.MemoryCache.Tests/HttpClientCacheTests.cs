@@ -11,7 +11,7 @@
     [TestFixture]
     public class HttpClientCacheTests
     {
-        [Ignore("Flacky")]
+        //[Ignore("Flacky")]
         [Test]
         public async Task HttpGetETagCacheTests()
         {
