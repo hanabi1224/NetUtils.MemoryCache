@@ -100,12 +100,33 @@
                 dataUpdateDetectInternal,
                 shouldReloadInBackground);
 
-            var val = cacheItem.Data as Lazy<T>;
-            eTag = cacheItem.ETag;
-            return val.Value;
+            try
+            {
+                var val = cacheItem.Data as Lazy<T>;
+                eTag = cacheItem.ETag;
+                return val.Value;
+            }
+            catch
+            {
+                if (cacheItem.PreviousCacheItem != null)
+                {
+                    var val = cacheItem.PreviousCacheItem.Data as Lazy<T>;
+                    eTag = cacheItem.PreviousCacheItem.ETag;
+                    var rollbackResult = val.Value;
+
+                    // Rollback
+                    cacheItem.Data = cacheItem.PreviousCacheItem.Data;
+                    eTag = cacheItem.ETag = cacheItem.PreviousCacheItem.ETag;
+                    cacheItem.PreviousCacheItem = null;
+
+                    return rollbackResult;
+                }
+
+                throw;
+            }
         }
 
-        private ICacheItem GetAutoReloadDataWithCacheInner<T>(
+        private CacheItem GetAutoReloadDataWithCacheInner<T>(
             string key,
             Func<T> dataFactory,
             Func<string> eTagFactory,
@@ -162,7 +183,7 @@
                 return oldCacheItem;
             }
 
-            return AddOrUpdate(key, dataFactory, timeToLive, eTagFactory?.Value);
+            return AddOrUpdate(key, dataFactory, timeToLive, eTagFactory?.Value, shouldStorePreviousCacheItem: true);
         }
 
         public T GetData<T>(string key)
@@ -210,10 +231,10 @@
 
         public void SetData(string key, object data, TimeSpan timeToLive, string eTag = null)
         {
-            AddOrUpdate(key, data, timeToLive, eTag);
+            AddOrUpdate(key, data, timeToLive, eTag, shouldStorePreviousCacheItem: false);
         }
 
-        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
+        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag, bool shouldStorePreviousCacheItem)
         {
             return _keyDataMappings.AddOrUpdate(
                 key,
@@ -222,12 +243,19 @@
                 {
                     if (c.IsUpdateNeeded(eTag))
                     {
-                        if (c.IsDataDisposable)
+                        if (c.PreviousCacheItem?.IsDataDisposable == true)
                         {
-                            _itemsToDispose.Enqueue(c);
+                            _itemsToDispose.Enqueue(c.PreviousCacheItem);
                         }
 
-                        return new CacheItem(k, data, eTag, timeToLive);
+                        c.PreviousCacheItem = null;
+                        var newItem = new CacheItem(k, data, eTag, timeToLive);
+                        if (shouldStorePreviousCacheItem)
+                        {
+                            newItem.PreviousCacheItem = c;
+                        }
+
+                        return newItem;
                     }
 
                     c.LastAccessUtc = DateTimeOffset.UtcNow;
