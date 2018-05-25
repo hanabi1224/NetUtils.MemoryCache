@@ -11,9 +11,15 @@ namespace NetUtils.MemoryCache.Tests
     public class ConcurrencyTests
     {
         [Test]
-        [TestCase(100)]
-        [TestCase(3)]
-        public void TestCacheFuntionConcurrency(int numberOfConcurrentTasks)
+        [TestCase(10000, true)]
+        [TestCase(1000, true)]
+        [TestCase(100, true)]
+        [TestCase(10, true)]
+        [TestCase(10000, false)]
+        [TestCase(1000, false)]
+        [TestCase(100, false)]
+        [TestCase(10, false)]
+        public void TestCacheFuntionConcurrency(int numberOfConcurrentTasks, bool shouldReloadInBackground)
         {
             var key = Guid.NewGuid().ToString();
             var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
@@ -22,42 +28,50 @@ namespace NetUtils.MemoryCache.Tests
             {
                 cache.GetAutoReloadDataWithInterval(
                     key,
-                    () =>
+                    async () =>
                     {
-                        Thread.Sleep(RandomUtil.Random.Next(900) + 100);
+                        await Task.Delay(RandomUtil.Random.Next(900) + 100).ConfigureAwait(false);
                         Interlocked.Increment(ref counter);
                         return i;
                     },
                     TimeSpan.FromDays(1),
-                    TimeSpan.FromHours(1));
+                    TimeSpan.FromHours(1),
+                    shouldReloadInBackground: shouldReloadInBackground);
             });
 
             counter.Should().Be(1);
         }
 
-        ////[Test]
-        ////public async Task TestCacheAsyncFuntionConcurrency()
-        ////{
-        ////    var key = Guid.NewGuid().ToString();
-        ////    var cache = MemoryCache.GetNamedInstance(nameof(TestCacheAsyncFuntionConcurrency));
+        [Test]
+        [TestCase(10000, true)]
+        [TestCase(1000, true)]
+        [TestCase(100, true)]
+        [TestCase(10, true)]
+        [TestCase(10000, false)]
+        [TestCase(1000, false)]
+        [TestCase(100, false)]
+        [TestCase(10, false)]
+        public void TestCacheFuntionConcurrencyPerf(int numberOfConcurrentTasks, bool shouldReloadInBackground)
+        {
+            var key = Guid.NewGuid().ToString();
+            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
+            var counter = 0;
+            Parallel.For(0, numberOfConcurrentTasks, i =>
+            {
+                cache.GetAutoReloadDataWithInterval(
+                    key,
+                    async () =>
+                    {
+                        await Task.Delay(500).ConfigureAwait(false);
+                        Interlocked.Increment(ref counter);
+                        return i;
+                    },
+                    TimeSpan.FromDays(1),
+                    TimeSpan.FromHours(1),
+                    shouldReloadInBackground: shouldReloadInBackground);
+            });
 
-        ////    var counter = 0;
-        ////    var tasks = new List<Task>();
-        ////    for (var i = 0; i < 100; i++)
-        ////    {
-        ////        var t = cache.GetDataOrCreateAsync(key, async () =>
-        ////        {
-        ////            await Task.Delay(RandomUtil.Random.Next(900) + 100);
-        ////            Interlocked.Increment(ref counter);
-        ////            return i;
-        ////        }, TimeSpan.FromDays(1)).ContinueWith(async _ => (await _.ConfigureAwait(false)).Should().BeGreaterOrEqualTo(0));
-
-        ////        tasks.Add(t);
-        ////    }
-
-        ////    await Task.WhenAll(tasks);
-
-        ////    counter.Should().Be(1);
-        ////}
+            counter.Should().Be(1);
+        }
     }
 }
