@@ -8,8 +8,6 @@
 
         TimeSpan CleanInternal { get; set; }
 
-        bool UseStrictThreadSafeModeForAutoReload { get; set; }
-
         int Size { get; }
 
         T GetAutoReloadDataWithCache<T>(

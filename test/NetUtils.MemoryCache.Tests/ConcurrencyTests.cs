@@ -11,13 +11,12 @@ namespace NetUtils.MemoryCache.Tests
     public class ConcurrencyTests
     {
         [Test]
-        [TestCase(true, 100)]
-        [TestCase(false, 3)]
-        public void TestCacheFuntionConcurrency(bool useStrictThreadSafeMode, int numberOfConcurrentTasks)
+        [TestCase(100)]
+        [TestCase(3)]
+        public void TestCacheFuntionConcurrency(int numberOfConcurrentTasks)
         {
             var key = Guid.NewGuid().ToString();
             var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
-            cache.UseStrictThreadSafeModeForAutoReload = useStrictThreadSafeMode;
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {

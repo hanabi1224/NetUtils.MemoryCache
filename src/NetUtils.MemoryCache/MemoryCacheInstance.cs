@@ -10,11 +10,12 @@
 
     internal class MemoryCacheInstance : DisposableBase, ICacheInstance
     {
+        private readonly ConcurrentDictionary<string, object> _keyTmpLockMappings = new ConcurrentDictionary<string, object>();
         private readonly ConcurrentDictionary<string, CacheItem> _keyDataMappings = new ConcurrentDictionary<string, CacheItem>();
         private readonly ConcurrentQueue<IDisposable> _itemsToDispose = new ConcurrentQueue<IDisposable>();
 
         private readonly ReaderWriterLockSlim _lockForClean = new ReaderWriterLockSlim();
-        private readonly Lazy<ReaderWriterLockSlim> _lockForLazyData = LazyUtils.ToLazy(() => new ReaderWriterLockSlim());
+        private readonly Lazy<ReaderWriterLockSlim> _lockForTmpLockDict = LazyUtils.ToLazy(() => new ReaderWriterLockSlim());
 
         private DateTimeOffset _lastClean = DateTimeOffset.MinValue;
 
@@ -28,8 +29,6 @@
         public string Name { get; }
 
         public TimeSpan CleanInternal { get; set; } = DefaultCacheCleanInternal;
-
-        public bool UseStrictThreadSafeModeForAutoReload { get; set; } = true;
 
         public int Size => _keyDataMappings.Count;
 
@@ -100,30 +99,8 @@
                 dataUpdateDetectInternal,
                 shouldReloadInBackground);
 
-            try
-            {
-                var val = cacheItem.Data as Lazy<T>;
-                eTag = cacheItem.ETag;
-                return val.Value;
-            }
-            catch
-            {
-                if (cacheItem.PreviousCacheItem != null)
-                {
-                    var val = cacheItem.PreviousCacheItem.Data as Lazy<T>;
-                    eTag = cacheItem.PreviousCacheItem.ETag;
-                    var rollbackResult = val.Value;
-
-                    // Rollback
-                    cacheItem.Data = cacheItem.PreviousCacheItem.Data;
-                    eTag = cacheItem.ETag = cacheItem.PreviousCacheItem.ETag;
-                    cacheItem.PreviousCacheItem = null;
-
-                    return rollbackResult;
-                }
-
-                throw;
-            }
+            eTag = cacheItem.ETag;
+            return (T)cacheItem.Data;
         }
 
         private CacheItem GetAutoReloadDataWithCacheInner<T>(
@@ -149,23 +126,7 @@
                 return cacheItem;
             }
 
-            if (UseStrictThreadSafeModeForAutoReload)
-            {
-                _lockForLazyData.Value.EnterWriteLock();
-                TryGetDataInner(key, out cacheItem);
-            }
-
-            try
-            {
-                return SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: true);
-            }
-            finally
-            {
-                if (UseStrictThreadSafeModeForAutoReload)
-                {
-                    _lockForLazyData.Value.ExitWriteLock();
-                }
-            }
+            return SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: true);
         }
 
         private CacheItem SetOrUpdateLazyData<T>(
@@ -177,13 +138,90 @@
             TimeSpan dataUpdateDetectInternal,
             bool shouldWaitForLock)
         {
-            var isUpdateNeeded = oldCacheItem == null || oldCacheItem.IsUpdateNeeded(eTagFactory, dataUpdateDetectInternal, shouldWaitForLock);
-            if (!isUpdateNeeded)
+            object tmpLock = null;
+            object lockToWait = null;
+            if (oldCacheItem == null)
             {
-                return oldCacheItem;
+                _lockForTmpLockDict.Value.EnterWriteLock();
+                try
+                {
+                    lockToWait = tmpLock = _keyTmpLockMappings.GetOrAdd(key, new object());
+                }
+                finally
+                {
+                    _lockForTmpLockDict.Value.ExitWriteLock();
+                }
+            }
+            else
+            {
+                lockToWait = oldCacheItem.LockObj;
             }
 
-            return AddOrUpdate(key, dataFactory, timeToLive, eTagFactory?.Value, shouldStorePreviousCacheItem: true);
+            bool lockAquired = false;
+            try
+            {
+                if (tmpLock != null)
+                {
+                    Monitor.Enter(lockToWait);
+                    lockAquired = true;
+                    if (TryGetDataInner(key, out var updatedOldCacheItem))
+                    {
+                        return updatedOldCacheItem;
+                    }
+                }
+                else if (shouldWaitForLock)
+                {
+                    Monitor.Enter(lockToWait);
+                    lockAquired = true;
+                }
+                else
+                {
+                    lockAquired = Monitor.TryEnter(lockToWait);
+                }
+
+                if (!lockAquired)
+                {
+                    return oldCacheItem;
+                }
+
+                var isUpdateNeeded = oldCacheItem?.IsUpdateNeeded(eTagFactory, dataUpdateDetectInternal) != false;
+                if (!isUpdateNeeded)
+                {
+                    return oldCacheItem;
+                }
+
+                return AddOrUpdate(key, dataFactory.Value, timeToLive, eTagFactory?.Value);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                if (oldCacheItem != null)
+                {
+                    return oldCacheItem;
+                }
+
+                throw;
+            }
+            finally
+            {
+                if (tmpLock != null)
+                {
+                    _lockForTmpLockDict.Value.EnterWriteLock();
+                    try
+                    {
+                        _keyTmpLockMappings.TryRemove(key, out _);
+                    }
+                    finally
+                    {
+                        _lockForTmpLockDict.Value.ExitWriteLock();
+                    }
+                }
+
+                if (lockAquired)
+                {
+                    Monitor.Exit(lockToWait);
+                }
+            }
         }
 
         public T GetData<T>(string key)
@@ -226,15 +264,17 @@
                 return true;
             }
 
+            _keyTmpLockMappings.TryRemove(key, out _);
+
             return false;
         }
 
         public void SetData(string key, object data, TimeSpan timeToLive, string eTag = null)
         {
-            AddOrUpdate(key, data, timeToLive, eTag, shouldStorePreviousCacheItem: false);
+            AddOrUpdate(key, data, timeToLive, eTag);
         }
 
-        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag, bool shouldStorePreviousCacheItem)
+        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
         {
             return _keyDataMappings.AddOrUpdate(
                 key,
@@ -243,18 +283,12 @@
                 {
                     if (c.IsUpdateNeeded(eTag))
                     {
-                        if (c.PreviousCacheItem?.IsDataDisposable == true)
+                        if (c.IsDataDisposable)
                         {
-                            _itemsToDispose.Enqueue(c.PreviousCacheItem);
+                            _itemsToDispose.Enqueue(c);
                         }
 
-                        c.PreviousCacheItem = null;
                         var newItem = new CacheItem(k, data, eTag, timeToLive);
-                        if (shouldStorePreviousCacheItem)
-                        {
-                            newItem.PreviousCacheItem = c;
-                        }
-
                         return newItem;
                     }
 
@@ -267,12 +301,10 @@
 
         internal bool TryGetDataInner(string key, out CacheItem cacheItem)
         {
-            var success = false;
-            cacheItem = null;
-
-            success = _keyDataMappings.TryGetValue(key, out cacheItem) && cacheItem != null;
+            var success = _keyDataMappings.TryGetValue(key, out cacheItem) && cacheItem != null;
             if (!success)
             {
+                cacheItem = null;
                 return false;
             }
 
@@ -283,6 +315,7 @@
             }
 
             TryDeleteKey(key);
+            cacheItem = null;
             return false;
         }
 
@@ -296,9 +329,10 @@
             }
 
             _keyDataMappings.Clear();
+            _keyTmpLockMappings.Clear();
 
             _lockForClean.Dispose();
-            (_lockForLazyData as IDisposable).Dispose();
+            (_lockForTmpLockDict as IDisposable).Dispose();
         }
     }
 }
