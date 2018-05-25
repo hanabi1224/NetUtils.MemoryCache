@@ -95,20 +95,20 @@ namespace NetUtils.MemoryCache.Tests
             data.Should().Be(8);
 
             var exceptionCount = 0;
-            Func<int> exceptionFunc = () =>
+            Func<Task<int>> exceptionFunc = async () =>
             {
-                Thread.Sleep(RandomUtil.Random.Next(500) + 500);
+                await Task.Delay(RandomUtil.Random.Next(20) + 20).ConfigureAwait(false);
                 Interlocked.Increment(ref exceptionCount);
                 throw new InvalidOperationException();
             };
 
             for (var i = 0; i < 5; i++)
             {
-                await Task.Delay(110);
+                await Task.Delay(150);
                 data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
                 if (shouldReloadInBackground)
                 {
-                    await Task.Delay(10);
+                    await Task.Delay(80);
                     data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
                 }
 
@@ -116,11 +116,11 @@ namespace NetUtils.MemoryCache.Tests
                 exceptionCount.Should().Be(i + 1);
             }
 
-            await Task.Delay(110);
+            await Task.Delay(150);
             data = cache.GetAutoReloadDataWithInterval(key, () => 6, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             if (shouldReloadInBackground)
             {
-                await Task.Delay(10);
+                await Task.Delay(80);
                 data.Should().Be(8);
                 data = cache.GetAutoReloadDataWithInterval(key, exceptionFunc, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             }

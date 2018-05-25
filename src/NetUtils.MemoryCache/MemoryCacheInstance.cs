@@ -100,30 +100,8 @@
                 dataUpdateDetectInternal,
                 shouldReloadInBackground);
 
-            try
-            {
-                var val = cacheItem.Data as Lazy<T>;
-                eTag = cacheItem.ETag;
-                return val.Value;
-            }
-            catch
-            {
-                if (cacheItem.PreviousCacheItem != null)
-                {
-                    var val = cacheItem.PreviousCacheItem.Data as Lazy<T>;
-                    eTag = cacheItem.PreviousCacheItem.ETag;
-                    var rollbackResult = val.Value;
-
-                    // Rollback
-                    cacheItem.Data = cacheItem.PreviousCacheItem.Data;
-                    eTag = cacheItem.ETag = cacheItem.PreviousCacheItem.ETag;
-                    cacheItem.PreviousCacheItem = null;
-
-                    return rollbackResult;
-                }
-
-                throw;
-            }
+            eTag = cacheItem.ETag;
+            return (T)cacheItem.Data;
         }
 
         private CacheItem GetAutoReloadDataWithCacheInner<T>(
@@ -183,7 +161,20 @@
                 return oldCacheItem;
             }
 
-            return AddOrUpdate(key, dataFactory, timeToLive, eTagFactory?.Value, shouldStorePreviousCacheItem: true);
+            try
+            {
+                return AddOrUpdate(key, dataFactory.Value, timeToLive, eTagFactory?.Value);
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError(e.ToString());
+                if (oldCacheItem != null)
+                {
+                    return oldCacheItem;
+                }
+
+                throw;
+            }
         }
 
         public T GetData<T>(string key)
@@ -231,10 +222,10 @@
 
         public void SetData(string key, object data, TimeSpan timeToLive, string eTag = null)
         {
-            AddOrUpdate(key, data, timeToLive, eTag, shouldStorePreviousCacheItem: false);
+            AddOrUpdate(key, data, timeToLive, eTag);
         }
 
-        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag, bool shouldStorePreviousCacheItem)
+        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
         {
             return _keyDataMappings.AddOrUpdate(
                 key,
@@ -243,18 +234,12 @@
                 {
                     if (c.IsUpdateNeeded(eTag))
                     {
-                        if (c.PreviousCacheItem?.IsDataDisposable == true)
+                        if (c.IsDataDisposable)
                         {
-                            _itemsToDispose.Enqueue(c.PreviousCacheItem);
+                            _itemsToDispose.Enqueue(c);
                         }
 
-                        c.PreviousCacheItem = null;
                         var newItem = new CacheItem(k, data, eTag, timeToLive);
-                        if (shouldStorePreviousCacheItem)
-                        {
-                            newItem.PreviousCacheItem = c;
-                        }
-
                         return newItem;
                     }
 

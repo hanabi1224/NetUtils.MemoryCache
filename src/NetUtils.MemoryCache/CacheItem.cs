@@ -46,8 +46,6 @@
 
         public TimeSpan TimeToLive { get; set; }
 
-        public CacheItem PreviousCacheItem { get; set; }
-
         public bool IsExpired
         {
             get
@@ -125,11 +123,6 @@
             if (IsDataDisposable)
             {
                 (Data as IDisposable).Dispose();
-            }
-
-            if (PreviousCacheItem?.IsDataDisposable == true)
-            {
-                (PreviousCacheItem.Data as IDisposable).Dispose();
             }
         }
     }
