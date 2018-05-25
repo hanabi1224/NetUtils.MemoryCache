@@ -15,7 +15,6 @@
         private readonly ConcurrentQueue<IDisposable> _itemsToDispose = new ConcurrentQueue<IDisposable>();
 
         private readonly ReaderWriterLockSlim _lockForClean = new ReaderWriterLockSlim();
-        private readonly Lazy<ReaderWriterLockSlim> _lockForTmpLockDict = LazyUtils.ToLazy(() => new ReaderWriterLockSlim());
 
         private DateTimeOffset _lastClean = DateTimeOffset.MinValue;
 
@@ -142,15 +141,7 @@
             object lockToWait = null;
             if (oldCacheItem == null)
             {
-                _lockForTmpLockDict.Value.EnterWriteLock();
-                try
-                {
-                    lockToWait = tmpLock = _keyTmpLockMappings.GetOrAdd(key, new object());
-                }
-                finally
-                {
-                    _lockForTmpLockDict.Value.ExitWriteLock();
-                }
+                lockToWait = tmpLock = _keyTmpLockMappings.GetOrAdd(key, new object());
             }
             else
             {
@@ -206,15 +197,7 @@
             {
                 if (tmpLock != null)
                 {
-                    _lockForTmpLockDict.Value.EnterWriteLock();
-                    try
-                    {
-                        _keyTmpLockMappings.TryRemove(key, out _);
-                    }
-                    finally
-                    {
-                        _lockForTmpLockDict.Value.ExitWriteLock();
-                    }
+                    _keyTmpLockMappings.TryRemove(key, out _);
                 }
 
                 if (lockAquired)
@@ -332,7 +315,6 @@
             _keyTmpLockMappings.Clear();
 
             _lockForClean.Dispose();
-            (_lockForTmpLockDict as IDisposable).Dispose();
         }
     }
 }
