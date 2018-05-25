@@ -7,7 +7,7 @@
 
     internal class CacheItem : DisposableBase, ICacheItem
     {
-        private readonly object _lock = new object();
+        internal readonly object LockObj = new object();
 
         private readonly WeakReference<string> _key;
         public CacheItem(string key, object data, string eTag, TimeSpan timeToLive)
@@ -75,44 +75,26 @@
             return !(ETag == newETag && newETag != null);
         }
 
-        public bool IsUpdateNeeded(Lazy<string> newETagFactory, TimeSpan dataUpdateDetectInternal, bool shouldWaitForLock)
+        public bool IsUpdateNeeded(Lazy<string> newETagFactory, TimeSpan dataUpdateDetectInternal)
         {
-            bool lockAquired = false;
-            if (shouldWaitForLock)
+            try
             {
-                Monitor.Enter(_lock);
-                lockAquired = true;
+                if (dataUpdateDetectInternal <= TimeSpan.Zero)
+                {
+                    return true;
+                }
+
+                if (LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) > DateTimeOffset.UtcNow)
+                {
+                    return false;
+                }
+
+                LastETagCheckUtc = DateTimeOffset.UtcNow;
+                return IsUpdateNeeded(newETagFactory?.Value);
             }
-            else
+            catch (Exception e)
             {
-                lockAquired = Monitor.TryEnter(_lock);
-            }
-
-            if (lockAquired)
-            {
-                try
-                {
-                    if (dataUpdateDetectInternal <= TimeSpan.Zero)
-                    {
-                        return true;
-                    }
-
-                    if (LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) > DateTimeOffset.UtcNow)
-                    {
-                        return false;
-                    }
-
-                    LastETagCheckUtc = DateTimeOffset.UtcNow;
-                    return IsUpdateNeeded(newETagFactory?.Value);
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError(e.ToString());
-                }
-                finally
-                {
-                    Monitor.Exit(_lock);
-                }
+                Trace.TraceError(e.ToString());
             }
 
             return false;
