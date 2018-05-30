@@ -21,6 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.7.18" />
     <PackageReference Include="OpenCover" Version="4.6.519">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

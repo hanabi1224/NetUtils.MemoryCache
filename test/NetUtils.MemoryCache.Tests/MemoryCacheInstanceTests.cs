@@ -34,9 +34,9 @@ namespace NetUtils.MemoryCache.Tests
         }
 
         [Test]
-        public async Task TestDeleteKey_Disposable()
+        public async Task TestDeleteKey_DisposableAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey_Disposable));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey_DisposableAsync));
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
             var key = Guid.NewGuid().ToString();
             var isDisposed = false;
@@ -66,7 +66,7 @@ namespace NetUtils.MemoryCache.Tests
         ////}
 
         [Test]
-        public async Task TestClear()
+        public async Task TestClearAsync()
         {
             var cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey));
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
@@ -87,9 +87,9 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task TestAutoReloadOnException(bool shouldReloadInBackground)
+        public async Task TestAutoReloadOnExceptionAsync(bool shouldReloadInBackground)
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestAutoReloadOnException));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestAutoReloadOnExceptionAsync));
             var key = Guid.NewGuid().ToString();
             var data = cache.GetAutoReloadDataWithInterval(key, () => 8, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             data.Should().Be(8);

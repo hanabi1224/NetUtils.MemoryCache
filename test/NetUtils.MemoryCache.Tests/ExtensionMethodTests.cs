@@ -9,9 +9,9 @@ namespace NetUtils.MemoryCache.Tests
     public class ExtensionMethodTests
     {
         [Test]
-        public async Task TestGetData_Generic()
+        public async Task TestGetData_GenericAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestGetData_Generic));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestGetData_GenericAsync));
             var key = Guid.NewGuid().ToString();
 
             var data = (1, 2, 3);
@@ -47,9 +47,9 @@ namespace NetUtils.MemoryCache.Tests
         }
 
         [Test]
-        public async Task TestGetData_NonGeneric()
+        public async Task TestGetData_NonGenericAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestGetData_NonGeneric));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestGetData_NonGenericAsync));
             var key = Guid.NewGuid().ToString();
 
             var data = (1, 2, 3);

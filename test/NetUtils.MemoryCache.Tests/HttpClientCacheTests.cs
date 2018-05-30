@@ -15,9 +15,9 @@
     {
         [Ignore("Flacky")]
         [Test]
-        public async Task HttpGetETagCacheTests()
+        public async Task HttpGetETagCacheTestsAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(HttpGetETagCacheTests));
+            var cache = MemoryCache.GetNamedInstance(nameof(HttpGetETagCacheTestsAsync));
             using (var client = new HttpClient())
             {
                 var baseUrl = $"https://httpbin.org/etag/";
