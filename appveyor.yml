@@ -7,8 +7,13 @@ branches:
   - master
 configuration: Release
 before_build:
+- choco install opencover.portable
+- choco install codecov
 - cmd: msbuild /m /t:restore
 build:
   verbosity: minimal
+test_script:
+- OpenCover.Console.exe -register:user -target:"nunit3-console" -targetargs:".\test\NetUtils.MemoryCache.Tests\bin\Release\net462\NetUtils.MemoryCache.Tests.dll -noshadow" -output:".\coverage.xml"
+- codecov -f "coverage.xml
 artifacts:
 - path: '**\*.nupkg'
