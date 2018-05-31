@@ -17,9 +17,13 @@
   <ItemGroup>
     <Reference Include="System.Net.Http" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\NetUtils.MemoryCache\NetUtils.MemoryCache.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCover" Version="4.6.519" />
   </ItemGroup>
 
 </Project>
