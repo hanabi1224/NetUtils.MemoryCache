@@ -11,9 +11,9 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         [TestCase(true)]
         [TestCase(false)]
-        public async Task GetAutoReloadDataWithIntervalTests(bool shouldReloadInBackground)
+        public async Task GetAutoReloadDataWithIntervalTestsAsync(bool shouldReloadInBackground)
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(GetAutoReloadDataWithIntervalTests));
+            var cache = MemoryCache.GetNamedInstance(nameof(GetAutoReloadDataWithIntervalTestsAsync));
             var key = Guid.NewGuid().ToString();
             var dataReloadInterval = TimeSpan.FromMilliseconds(200);
             var ref1 = GetOrCreate(cache, key, dataReloadInterval, shouldReloadInBackground: shouldReloadInBackground);

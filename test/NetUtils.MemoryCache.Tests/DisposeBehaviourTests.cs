@@ -10,9 +10,9 @@ namespace NetUtils.MemoryCache.Tests
     public class DisposeBehaviourTests
     {
         [Test]
-        public async Task TestCacheDelete_DataShouldBeDisposed()
+        public async Task TestCacheDelete_DataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposed));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = new DummyDisposable(() => { isDisposed = true; });
@@ -26,9 +26,9 @@ namespace NetUtils.MemoryCache.Tests
         }
 
         [Test]
-        public async Task TestCacheDelete_LazyDataShouldBeDisposed()
+        public async Task TestCacheDelete_LazyDataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposed));
+            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = LazyUtils.ToLazy(() => new DummyDisposable(() => { isDisposed = true; }));
