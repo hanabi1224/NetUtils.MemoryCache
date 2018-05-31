@@ -7,7 +7,7 @@ branches:
   - master
 configuration: Release
 before_build:
-- cmd: msbuild /m /t:restore
+- cmd: dotnet restore
 build:
   verbosity: minimal
 artifacts:
