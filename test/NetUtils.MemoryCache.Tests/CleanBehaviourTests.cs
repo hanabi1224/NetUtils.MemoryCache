@@ -8,7 +8,6 @@ namespace NetUtils.MemoryCache.Tests
     [TestFixture]
     public class CleanBehaviourTests
     {
-        [Ignore("flacky")]
         [Test]
         [TestCase(true)]
         [TestCase(false)]
@@ -26,9 +25,7 @@ namespace NetUtils.MemoryCache.Tests
             cache.Size.Should().Be(2);
             await Task.Delay(TimeSpan.FromMilliseconds(100));
             cache.Size.Should().Be(2);
-            await Task.Delay(TimeSpan.FromMilliseconds(200));
-            cache.Size.Should().Be(1);
-            await Task.Delay(TimeSpan.FromMilliseconds(400));
+            await Task.Delay(TimeSpan.FromMilliseconds(1000));
             cache.Size.Should().Be(0);
 
             MemoryCache.TryDeleteNamedInstance(cacheName).Should().BeTrue();
