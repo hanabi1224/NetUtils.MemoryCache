@@ -9,14 +9,9 @@ namespace NetUtils.MemoryCache
     {
         private static readonly ConcurrentDictionary<string, ICacheInstance> _namedCacheInstances = new ConcurrentDictionary<string, ICacheInstance>();
 
-        private static readonly Timer _cacheCleanTimer;
+        private static readonly Timer _cacheCleanTimer = new Timer(_ => CleanUp(), null, CacheCleanCheckInternal, CacheCleanCheckInternal);
 
         public static readonly TimeSpan DefaultCacheCleanCheckInternal = TimeSpan.FromMinutes(1);
-
-        static MemoryCache()
-        {
-            _cacheCleanTimer = new Timer(_ => CleanUp(), null, CacheCleanCheckInternal, CacheCleanCheckInternal);
-        }
 
         private static TimeSpan _cacheCleanCheckInternal = DefaultCacheCleanCheckInternal;
         public static TimeSpan CacheCleanCheckInternal
