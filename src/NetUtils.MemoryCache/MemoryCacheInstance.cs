@@ -116,7 +116,9 @@
                 var isUpdateProbobalyNeeded = cacheItem.LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) < DateTimeOffset.UtcNow;
                 if (isUpdateProbobalyNeeded)
                 {
+#pragma warning disable VSTHRD110
                     Task.Run(() =>
+#pragma warning restore VSTHRD110
                     {
                         SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: false);
                     });
