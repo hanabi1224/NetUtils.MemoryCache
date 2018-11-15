@@ -6,14 +6,12 @@ branches:
   only:
   - master
 configuration: Release
-before_build:
-- cmd: dotnet restore
-build:
-  verbosity: minimal
+build_script:
+- cmd: dotnet build -c Release
 after_test:
 - choco install opencover.portable
 - choco install codecov
-- OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test --framework net471 --verbosity q"
+- OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test -c Release --framework net472 --verbosity q"
 - codecov -f "results.xml" 
 artifacts:
 - path: '**\*.nupkg'
