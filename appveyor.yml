@@ -6,10 +6,8 @@ branches:
   only:
   - master
 configuration: Release
-before_build:
-- cmd: dotnet restore
-build:
-  verbosity: minimal
+build_script:
+- cmd: dotnet build -c Release
 after_test:
 - choco install opencover.portable
 - choco install codecov
