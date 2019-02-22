@@ -1,10 +1,11 @@
-﻿namespace NetUtils.MemoryCache.Utils
-{
-    using System;
+﻿
+using System;
 
+namespace NetUtils.MemoryCache.Utils
+{
     public abstract class DisposableBase : IDisposable
     {
-        private bool isDisposed;
+        private bool _isDisposed;
 
         ~DisposableBase()
         {
@@ -19,7 +20,7 @@
 
         protected virtual void Dispose(bool disposing)
         {
-            if (this.isDisposed)
+            if (_isDisposed)
             {
                 return;
             }
@@ -29,7 +30,7 @@
                 this.DisposeResources();
             }
 
-            this.isDisposed = true;
+            _isDisposed = true;
         }
 
         protected abstract void DisposeResources();

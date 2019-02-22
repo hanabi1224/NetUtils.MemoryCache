@@ -1,20 +1,21 @@
-﻿namespace NetUtils.MemoryCache.Utils
-{
-    using System;
+﻿
+using System;
 
+namespace NetUtils.MemoryCache.Utils
+{
     public static class RandomUtil
     {
         [ThreadStatic]
-        private static Random _random;
+        private static Random t_random;
         public static Random Random
         {
             get
             {
-                if (_random == null)
+                if (t_random == null)
                 {
-                    _random = new Random(Guid.NewGuid().GetHashCode());
+                    t_random = new Random(Guid.NewGuid().GetHashCode());
                 }
-                return _random;
+                return t_random;
             }
         }
     }

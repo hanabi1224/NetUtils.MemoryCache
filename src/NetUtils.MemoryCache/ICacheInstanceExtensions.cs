@@ -1,8 +1,9 @@
-﻿namespace NetUtils.MemoryCache
-{
-    using System;
-    using System.Threading.Tasks;
+﻿
+using System;
+using System.Threading.Tasks;
 
+namespace NetUtils.MemoryCache
+{
     public static class ICacheInstanceExtensions
     {
         public static T GetAutoReloadDataWithInterval<T>(

@@ -32,8 +32,8 @@ namespace NetUtils.MemoryCache.Tests
             var key = Guid.NewGuid().ToString();
 
             var data = (1, 2, 3);
-            cache.SetData(key, data, TimeSpan.MaxValue);  
-            
+            cache.SetData(key, data, TimeSpan.MaxValue);
+
             var dataRef = cache.GetData<(int, int, int)>(key);
             dataRef.Should().NotBeNull();
             dataRef.Should().Be(data);
