@@ -1,7 +1,8 @@
-﻿namespace NetUtils.MemoryCache
-{
-    using System;
+﻿
+using System;
 
+namespace NetUtils.MemoryCache
+{
     public interface ICacheInstance : IDisposable
     {
         string Name { get; }

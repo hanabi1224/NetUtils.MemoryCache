@@ -1,13 +1,14 @@
-﻿namespace NetUtils.MemoryCache
-{
-    using System;
-    using System.Collections.Concurrent;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Utils;
+﻿
+using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using NetUtils.MemoryCache.Utils;
 
+namespace NetUtils.MemoryCache
+{
     internal class MemoryCacheInstance : DisposableBase, ICacheInstance
     {
         private readonly ConcurrentDictionary<string, object> _keyTmpLockMappings = new ConcurrentDictionary<string, object>();
@@ -59,7 +60,6 @@
                     }
 
                     _lastClean = utcNow;
-
                 }
                 catch (Exception e)
                 {

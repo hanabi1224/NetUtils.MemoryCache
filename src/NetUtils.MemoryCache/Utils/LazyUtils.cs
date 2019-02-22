@@ -1,11 +1,12 @@
-﻿namespace NetUtils.MemoryCache.Utils
-{
-    using System;
-    using System.Threading.Tasks;
+﻿
+using System;
+using System.Threading.Tasks;
 
+namespace NetUtils.MemoryCache.Utils
+{
     public static class LazyUtils
     {
-        private static readonly Type _typeIDisposable = typeof(IDisposable);
+        private static readonly Type s_typeIDisposable = typeof(IDisposable);
 
         public static Lazy<T> ToLazy<T>(this Func<T> func, bool isThreadSafe = true)
         {
@@ -14,7 +15,7 @@
                 return null;
             }
 
-            if (_typeIDisposable.IsAssignableFrom(typeof(T)))
+            if (s_typeIDisposable.IsAssignableFrom(typeof(T)))
             {
                 return new LazyDisposable<T>(func, isThreadSafe: isThreadSafe);
             }
@@ -31,7 +32,7 @@
                 return null;
             }
 
-            if (_typeIDisposable.IsAssignableFrom(typeof(T)))
+            if (s_typeIDisposable.IsAssignableFrom(typeof(T)))
             {
                 return new LazyDisposable<T>(() => func.Invoke().ConfigureAwait(false).GetAwaiter().GetResult(), isThreadSafe: isThreadSafe);
             }

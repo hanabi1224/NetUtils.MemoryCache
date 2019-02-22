@@ -19,7 +19,7 @@ namespace NetUtils.MemoryCache.Tests
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, data, TimeSpan.MaxValue);
             cache.TryDeleteKey(key).Should().BeTrue();
-            isDisposed.Should().Be(false);            
+            isDisposed.Should().Be(false);
             await Task.Delay(cache.CleanInternal.Add(TimeSpan.FromMilliseconds(500)));
             cache.CleanIfNeeded();
             isDisposed.Should().Be(true);

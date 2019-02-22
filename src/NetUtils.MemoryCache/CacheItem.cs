@@ -1,10 +1,11 @@
-﻿namespace NetUtils.MemoryCache
-{
-    using System;
-    using System.Diagnostics;
-    using System.Threading;
-    using Utils;
+﻿
+using System;
+using System.Diagnostics;
+using System.Threading;
+using NetUtils.MemoryCache.Utils;
 
+namespace NetUtils.MemoryCache
+{
     internal class CacheItem : DisposableBase, ICacheItem
     {
         internal readonly object LockObj = new object();

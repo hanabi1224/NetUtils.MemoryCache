@@ -1,9 +1,10 @@
-﻿namespace NetUtils.MemoryCache.Utils
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
+﻿
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
+namespace NetUtils.MemoryCache.Utils
+{
     public class LazyDisposable<T> : Lazy<T>, IDisposable
     {
         [ExcludeFromCodeCoverage]
@@ -30,7 +31,7 @@
         }
 
         #region IDisposable
-        private bool isDisposed;
+        private bool _isDisposed;
 
         public void Dispose()
         {
@@ -40,7 +41,7 @@
 
         protected virtual void Dispose(bool disposing)
         {
-            if (this.isDisposed)
+            if (_isDisposed)
             {
                 return;
             }
@@ -50,7 +51,7 @@
                 this.DisposeResources();
             }
 
-            this.isDisposed = true;
+            _isDisposed = true;
         }
 
         protected void DisposeResources()
