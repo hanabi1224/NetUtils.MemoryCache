@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net472;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.2;</TargetFrameworks>
     <DebugType>pdbonly</DebugType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
