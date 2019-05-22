@@ -17,6 +17,9 @@ after_test:
     - codecov -f "results.xml"
 artifacts:
     - path: '**\*.nupkg'
+      name: nupkg
+    - path: '**\*.snupkg'
+      name: snupkg
 nuget:
     disable_publish_on_pr: true
 deploy:
