@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -27,7 +29,7 @@ namespace NetUtils.MemoryCache.Utils
 
         ~LazyDisposable()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         #region IDisposable
@@ -35,7 +37,7 @@ namespace NetUtils.MemoryCache.Utils
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -48,7 +50,7 @@ namespace NetUtils.MemoryCache.Utils
 
             if (disposing)
             {
-                this.DisposeResources();
+                DisposeResources();
             }
 
             _isDisposed = true;
@@ -56,9 +58,29 @@ namespace NetUtils.MemoryCache.Utils
 
         protected void DisposeResources()
         {
-            if (this.IsValueCreated && this.Value is IDisposable disposable)
+            if (IsValueCreated)
             {
-                disposable.Dispose();
+                if (Value is IDisposable disposable)
+                {
+                    disposable?.Dispose();
+                }
+                else if (Value is IEnumerable enumerable)
+                {
+                    foreach (var data in enumerable)
+                    {
+                        try
+                        {
+                            if (data is IDisposable innerDisposable)
+                            {
+                                innerDisposable?.Dispose();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError(e.ToString());
+                        }
+                    }
+                }
             }
         }
         #endregion

@@ -33,7 +33,7 @@ namespace NetUtils.MemoryCache
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            var result = s_namedCacheInstances.GetOrAdd(
+            ICacheInstance result = s_namedCacheInstances.GetOrAdd(
                 name,
                 key => new MemoryCacheInstance(name));
 
@@ -44,7 +44,7 @@ namespace NetUtils.MemoryCache
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
-            if (s_namedCacheInstances.TryRemove(name, out var cacheInstance))
+            if (s_namedCacheInstances.TryRemove(name, out ICacheInstance cacheInstance))
             {
                 using (cacheInstance)
                 {
@@ -58,7 +58,7 @@ namespace NetUtils.MemoryCache
         private static void CleanUp()
         {
             var snapshot = s_namedCacheInstances.Values.ToList();
-            foreach (var instance in snapshot)
+            foreach (ICacheInstance instance in snapshot)
             {
                 instance.CleanIfNeeded();
             }

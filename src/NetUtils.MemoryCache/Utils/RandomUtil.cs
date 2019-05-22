@@ -15,6 +15,7 @@ namespace NetUtils.MemoryCache.Utils
                 {
                     t_random = new Random(Guid.NewGuid().GetHashCode());
                 }
+
                 return t_random;
             }
         }

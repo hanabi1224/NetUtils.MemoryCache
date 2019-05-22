@@ -8,6 +8,8 @@ branches:
 configuration: Release
 build_script:
     - cmd: dotnet build -c Release
+test_script:
+    - cmd: dotnet test -c Release
 after_test:
     - choco install opencover.portable
     - choco install codecov
