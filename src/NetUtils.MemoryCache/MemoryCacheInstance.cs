@@ -38,7 +38,7 @@ namespace NetUtils.MemoryCache
             {
                 try
                 {
-                    var utcNow = DateTimeOffset.UtcNow;
+                    DateTimeOffset utcNow = DateTimeOffset.UtcNow;
                     if (utcNow < _lastClean + CleanInternal)
                     {
                         return;
@@ -54,7 +54,7 @@ namespace NetUtils.MemoryCache
                         }
                     }
 
-                    while (_itemsToDispose.TryDequeue(out var cacheItem))
+                    while (_itemsToDispose.TryDequeue(out IDisposable cacheItem))
                     {
                         cacheItem.Dispose();
                     }
@@ -90,7 +90,7 @@ namespace NetUtils.MemoryCache
             out string eTag,
             bool shouldReloadInBackground = true)
         {
-            var cacheItem = GetAutoReloadDataWithCacheInner<T>(
+            CacheItem cacheItem = GetAutoReloadDataWithCacheInner<T>(
                 key,
                 dataFactory,
                 eTagFactory,
@@ -110,7 +110,7 @@ namespace NetUtils.MemoryCache
             TimeSpan dataUpdateDetectInternal,
             bool shouldReloadInBackground)
         {
-            if (TryGetDataInner(key, out var cacheItem)
+            if (TryGetDataInner(key, out CacheItem cacheItem)
                 && shouldReloadInBackground)
             {
                 var isUpdateProbobalyNeeded = cacheItem.LastETagCheckUtc.AddSafe(dataUpdateDetectInternal) < DateTimeOffset.UtcNow;
@@ -157,7 +157,7 @@ namespace NetUtils.MemoryCache
                 {
                     Monitor.Enter(lockToWait);
                     lockAquired = true;
-                    if (TryGetDataInner(key, out var updatedOldCacheItem))
+                    if (TryGetDataInner(key, out CacheItem updatedOldCacheItem))
                     {
                         return updatedOldCacheItem;
                     }
@@ -211,7 +211,7 @@ namespace NetUtils.MemoryCache
 
         public T GetData<T>(string key)
         {
-            if (TryGetDataInner(key, out var cacheItem))
+            if (TryGetDataInner(key, out CacheItem cacheItem))
             {
                 try
                 {
@@ -229,7 +229,7 @@ namespace NetUtils.MemoryCache
 
         public object GetData(string key)
         {
-            if (TryGetDataInner(key, out var cacheItem) && cacheItem != null)
+            if (TryGetDataInner(key, out CacheItem cacheItem) && cacheItem != null)
             {
                 return cacheItem.Data;
             }
@@ -239,9 +239,9 @@ namespace NetUtils.MemoryCache
 
         public bool TryDeleteKey(string key)
         {
-            if (_keyDataMappings.TryRemove(key, out var item))
+            if (_keyDataMappings.TryRemove(key, out CacheItem item))
             {
-                if (item.IsDataDisposable)
+                if (item.IsDataDisposable || item.IsDataEnumerable)
                 {
                     _itemsToDispose.Enqueue(item);
                 }
@@ -268,7 +268,7 @@ namespace NetUtils.MemoryCache
                 {
                     if (c.IsUpdateNeeded(eTag))
                     {
-                        if (c.IsDataDisposable)
+                        if (c.IsDataDisposable || c.IsDataEnumerable)
                         {
                             _itemsToDispose.Enqueue(c);
                         }
@@ -308,7 +308,7 @@ namespace NetUtils.MemoryCache
         {
             //// Add lock here
 
-            foreach (var pair in _keyDataMappings)
+            foreach (System.Collections.Generic.KeyValuePair<string, CacheItem> pair in _keyDataMappings)
             {
                 pair.Value?.Dispose();
             }

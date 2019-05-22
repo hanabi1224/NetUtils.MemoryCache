@@ -34,9 +34,9 @@
     <!--<PackageReference Include="IDisposableAnalyzers" Version="2.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>-->
-    <PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2">
+    <!--<PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2">
       <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+    </PackageReference>-->
   </ItemGroup>
 
 </Project>

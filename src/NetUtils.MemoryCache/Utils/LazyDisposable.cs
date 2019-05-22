@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
@@ -56,9 +58,29 @@ namespace NetUtils.MemoryCache.Utils
 
         protected void DisposeResources()
         {
-            if (IsValueCreated && Value is IDisposable disposable)
+            if (IsValueCreated)
             {
-                disposable.Dispose();
+                if (Value is IDisposable disposable)
+                {
+                    disposable?.Dispose();
+                }
+                else if (Value is IEnumerable enumerable)
+                {
+                    foreach (var data in enumerable)
+                    {
+                        try
+                        {
+                            if (data is IDisposable innerDisposable)
+                            {
+                                innerDisposable?.Dispose();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError(e.ToString());
+                        }
+                    }
+                }
             }
         }
         #endregion

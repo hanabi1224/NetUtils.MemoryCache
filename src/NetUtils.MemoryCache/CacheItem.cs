@@ -111,24 +111,20 @@ namespace NetUtils.MemoryCache
             {
                 (Data as IDisposable)?.Dispose();
             }
-            else if (IsDataEnumerable)
+            else if (IsDataEnumerable && Data is IEnumerable enumerable)
             {
-                var enumerable = Data as IEnumerable;
-                if (enumerable != null)
+                foreach (var data in enumerable)
                 {
-                    foreach (var data in enumerable)
+                    try
                     {
-                        try
+                        if (data is IDisposable disposable)
                         {
-                            if (data is IDisposable disposable)
-                            {
-                                disposable?.Dispose();
-                            }
+                            disposable?.Dispose();
                         }
-                        catch (Exception e)
-                        {
-                            Trace.TraceError(e.ToString());
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Trace.TraceError(e.ToString());
                     }
                 }
             }
