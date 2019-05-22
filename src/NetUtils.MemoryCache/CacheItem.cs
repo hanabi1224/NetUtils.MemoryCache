@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading;
 using NetUtils.MemoryCache.Utils;
@@ -14,12 +15,13 @@ namespace NetUtils.MemoryCache
         public CacheItem(string key, object data, string eTag, TimeSpan timeToLive)
         {
             _key = new WeakReference<string>(key);
-            this.Data = data;
-            this.ETag = eTag;
-            this.TimeToLive = timeToLive;
+            Data = data;
+            ETag = eTag;
+            TimeToLive = timeToLive;
 
             LastAccessUtc = LastETagCheckUtc = DateTimeOffset.UtcNow;
             IsDataDisposable = Data is IDisposable;
+            IsDataEnumerable = Data is IEnumerable;
         }
 
         public string Key
@@ -38,6 +40,8 @@ namespace NetUtils.MemoryCache
         public object Data { get; set; }
 
         public bool IsDataDisposable { get; }
+
+        public bool IsDataEnumerable { get; }
 
         public string ETag { get; set; }
 
@@ -105,7 +109,28 @@ namespace NetUtils.MemoryCache
         {
             if (IsDataDisposable)
             {
-                (Data as IDisposable).Dispose();
+                (Data as IDisposable)?.Dispose();
+            }
+            else if (IsDataEnumerable)
+            {
+                var enumerable = Data as IEnumerable;
+                if (enumerable != null)
+                {
+                    foreach (var data in enumerable)
+                    {
+                        try
+                        {
+                            if (data is IDisposable disposable)
+                            {
+                                disposable?.Dispose();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Trace.TraceError(e.ToString());
+                        }
+                    }
+                }
             }
         }
     }

@@ -27,7 +27,7 @@ namespace NetUtils.MemoryCache.Utils
 
         ~LazyDisposable()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         #region IDisposable
@@ -35,7 +35,7 @@ namespace NetUtils.MemoryCache.Utils
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -48,7 +48,7 @@ namespace NetUtils.MemoryCache.Utils
 
             if (disposing)
             {
-                this.DisposeResources();
+                DisposeResources();
             }
 
             _isDisposed = true;
@@ -56,7 +56,7 @@ namespace NetUtils.MemoryCache.Utils
 
         protected void DisposeResources()
         {
-            if (this.IsValueCreated && this.Value is IDisposable disposable)
+            if (IsValueCreated && Value is IDisposable disposable)
             {
                 disposable.Dispose();
             }

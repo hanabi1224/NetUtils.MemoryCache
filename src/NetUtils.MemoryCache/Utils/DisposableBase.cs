@@ -3,34 +3,42 @@ using System;
 
 namespace NetUtils.MemoryCache.Utils
 {
-    public abstract class DisposableBase : IDisposable
+    public interface IDisposableObservable : IDisposable
     {
-        private bool _isDisposed;
+        /// <summary>
+        /// Gets a value indicating whether this object has been disposed.
+        /// </summary>
+        bool IsDisposed { get; }
+    }
+
+    public abstract class DisposableBase : IDisposableObservable
+    {
+        public bool IsDisposed { get; private set; }
 
         ~DisposableBase()
         {
-            this.Dispose(false);
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            this.Dispose(true);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (IsDisposed)
             {
                 return;
             }
 
             if (disposing)
             {
-                this.DisposeResources();
+                DisposeResources();
             }
 
-            _isDisposed = true;
+            IsDisposed = true;
         }
 
         protected abstract void DisposeResources();

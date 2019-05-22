@@ -130,7 +130,7 @@ namespace NetUtils.MemoryCache
             return SetOrUpdateLazyData(key, cacheItem, LazyUtils.ToLazy(dataFactory), LazyUtils.ToLazy(eTagFactory), timeToLive, dataUpdateDetectInternal, shouldWaitForLock: true);
         }
 
-        private CacheItem SetOrUpdateLazyData<T>(
+        protected CacheItem SetOrUpdateLazyData<T>(
             string key,
             CacheItem oldCacheItem,
             Lazy<T> dataFactory,
@@ -259,7 +259,7 @@ namespace NetUtils.MemoryCache
             AddOrUpdate(key, data, timeToLive, eTag);
         }
 
-        private CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
+        protected CacheItem AddOrUpdate(string key, object data, TimeSpan timeToLive, string eTag)
         {
             return _keyDataMappings.AddOrUpdate(
                 key,
@@ -313,10 +313,10 @@ namespace NetUtils.MemoryCache
                 pair.Value?.Dispose();
             }
 
-            _keyDataMappings.Clear();
-            _keyTmpLockMappings.Clear();
+            _keyDataMappings?.Clear();
+            _keyTmpLockMappings?.Clear();
 
-            _lockForClean.Dispose();
+            _lockForClean?.Dispose();
         }
     }
 }
