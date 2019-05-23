@@ -16,7 +16,7 @@
     <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>memory cache,cache,MemoryCache</PackageTags>
-    <Version>1.0.0-pre6</Version>
+    <Version>1.0.0-pre7</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -27,6 +27,7 @@
     <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
