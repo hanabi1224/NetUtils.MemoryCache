@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp2.2;</TargetFrameworks>
-    <DebugType>pdbonly</DebugType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
@@ -20,10 +19,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NetUtils.MemoryCache\NetUtils.MemoryCache.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="OpenCover" Version="4.*" />
   </ItemGroup>
 
 </Project>
