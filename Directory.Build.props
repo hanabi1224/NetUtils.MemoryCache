@@ -5,6 +5,7 @@
     <LangVersion>latest</LangVersion>
     <Deterministic>true</Deterministic>
     <Features>pdb-path-determinism</Features>
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

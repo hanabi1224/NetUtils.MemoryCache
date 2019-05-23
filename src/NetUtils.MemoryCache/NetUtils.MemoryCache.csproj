@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;netcoreapp2.1;</TargetFrameworks>
-    <DebugType>pdbonly</DebugType>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
@@ -13,11 +12,11 @@
     <Authors>hanabi1224@github.com</Authors>
     <Description>Yet another memory cache library that supports reloading data in background and handle disposable data properly</Description>
     <Copyright>Copyright (C) 2019 hanabi1224@github.com</Copyright>
-    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <PackageTags>memory cache,cache,MemoryCache</PackageTags>
-    <Version>1.0.0-pre6</Version>
+    <Version>1.0.0-pre7</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,6 +27,7 @@
     <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>.pdb;$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>
