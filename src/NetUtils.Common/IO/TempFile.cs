@@ -6,10 +6,12 @@ namespace NetUtils
 {
     public class TempFile : DisposableBase
     {
-        public static string TempFilesFolder { get; private set; } = Path.Combine(Path.GetTempPath(), "tempfiles");
+        private const string FolderName = ".tempfiles";
+        public static string TempFilesFolder { get; private set; }
 
         static TempFile()
         {
+            SetTempFilesFolder(Path.GetTempPath());
             Init();
         }
 
@@ -41,7 +43,7 @@ namespace NetUtils
 
         public static void SetTempFilesFolder(string folder)
         {
-            TempFilesFolder = folder.RequireNotNullOrEmpty(nameof(folder));
+            TempFilesFolder = Path.Combine(folder.RequireNotNullOrEmpty(nameof(folder)), FolderName);
             Init();
         }
 
