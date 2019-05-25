@@ -52,7 +52,7 @@ namespace NetUtils
         {
             if (IsValueCreated)
             {
-                var value = GetValueAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                TValue value = GetValueAsync().ConfigureAwait(false).GetAwaiter().GetResult();
                 if (value is IDisposable disposable)
                 {
                     disposable?.Dispose();

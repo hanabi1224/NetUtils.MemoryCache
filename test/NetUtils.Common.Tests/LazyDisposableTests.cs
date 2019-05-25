@@ -9,17 +9,10 @@ namespace NetUtils.Common.Tests
     [TestFixture]
     public class LazyDisposableTests
     {
-        private class Disposable : DisposableBase
-        {
-            protected override void DisposeResources()
-            {
-            }
-        }
-
         [Test]
         public void EnsureValueDisposed()
         {
-            var disposable = new Disposable();
+            var disposable = new DummyDisposable();
             disposable.IsDisposed.Should().BeFalse();
 
             var lazyAsync = LazyUtils.ToLazy(() => disposable);
@@ -38,7 +31,7 @@ namespace NetUtils.Common.Tests
         [Test]
         public async Task AsyncLazy_EnsureValueDisposedAsync()
         {
-            var disposable = new Disposable();
+            var disposable = new DummyDisposable();
             disposable.IsDisposed.Should().BeFalse();
 
             var lazyAsync = LazyUtils.ToAsyncLazy(async () => disposable);
@@ -57,7 +50,7 @@ namespace NetUtils.Common.Tests
         [Test]
         public void EnsureValueDisposed_Collection()
         {
-            var disposables = new List<Disposable> { new Disposable(), new Disposable() };
+            var disposables = new List<DummyDisposable> { new DummyDisposable(), new DummyDisposable() };
             disposables.ForEach(_ => _.IsDisposed.Should().BeFalse());
 
             var lazyAsync = LazyUtils.ToLazy(() => disposables);
@@ -76,7 +69,7 @@ namespace NetUtils.Common.Tests
         [Test]
         public async Task AsyncLazy_EnsureValueDisposed_CollectionAsync()
         {
-            var disposables = new List<Disposable> { new Disposable(), new Disposable() };
+            var disposables = new List<DummyDisposable> { new DummyDisposable(), new DummyDisposable() };
             disposables.ForEach(_ => _.IsDisposed.Should().BeFalse());
 
             var lazyAsync = LazyUtils.ToAsyncLazy(async () => disposables);
@@ -95,7 +88,7 @@ namespace NetUtils.Common.Tests
         [Test]
         public void EnsureValueDisposed_NotCreated()
         {
-            var disposable = new Disposable();
+            var disposable = new DummyDisposable();
             disposable.IsDisposed.Should().BeFalse();
 
             var lazyAsync = LazyUtils.ToLazy(() => disposable);
