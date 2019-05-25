@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;netcoreapp2.1;</TargetFrameworks>
     <Description>Yet another memory cache library that supports reloading data in background and handle disposable data properly</Description>
+    <PackageTags>memory cache,cache,MemoryCache</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

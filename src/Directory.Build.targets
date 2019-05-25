@@ -12,9 +12,8 @@
     <Copyright>Copyright (C) 2019 hanabi1224@github.com</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageTags>memory cache,cache,MemoryCache</PackageTags>
-    <Version>1.0.0-pre8</Version>
+    <RepositoryType>Git</RepositoryType>    
+    <Version>1.0.0-pre9</Version>
   </PropertyGroup>
 
   <PropertyGroup>
