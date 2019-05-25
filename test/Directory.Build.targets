@@ -1,5 +1,9 @@
 <Project>
 
+  <PropertyGroup>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.*" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
