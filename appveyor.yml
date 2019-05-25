@@ -7,14 +7,12 @@ branches:
         - master
 configuration: Release
 build_script:
-    - cmd: dotnet build -c Release
+    - cmd: dotnet build -c Release /m
 test_script:
-    - cmd: dotnet test -c Release
+    - cmd: dotnet test -c Release /m
 after_test:
-    - choco install opencover.portable
     - choco install codecov
-    - OpenCover.Console.exe -register:user -target:"C:\Program Files\dotnet\dotnet.exe" -targetargs:"test -c Release --framework net472 --verbosity q"
-    - codecov -f "results.xml"
+    - codecov -f "TestResults/coverage.opencover.xml"
 artifacts:
     - path: '**\*.nupkg'
       name: nupkg
