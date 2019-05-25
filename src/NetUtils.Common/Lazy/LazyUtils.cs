@@ -37,5 +37,15 @@ namespace NetUtils
 
             return ToLazy(func: () => func.Invoke().ConfigureAwait(false).GetAwaiter().GetResult(), isThreadSafe: isThreadSafe);
         }
+
+        public static AsyncLazy<T> ToAsyncLazy<T>(this Func<Task<T>> func)
+        {
+            if (func == null)
+            {
+                return null;
+            }
+
+            return new AsyncLazy<T>(func);
+        }
     }
 }

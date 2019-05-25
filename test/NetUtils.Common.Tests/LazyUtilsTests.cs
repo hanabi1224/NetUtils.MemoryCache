@@ -50,5 +50,19 @@ namespace NetUtils.Common.Tests
             var lazy = LazyUtils.ToLazy(async () => new List<MemoryStream> { new MemoryStream(), new MemoryStream(), new MemoryStream() });
             (lazy is IDisposable).Should().BeTrue();
         }
+
+        [Test]
+        public void TestToAsyncLazy_NonDisposable()
+        {
+            var lazy = LazyUtils.ToAsyncLazy(async () => 3);
+            (lazy is IDisposable).Should().BeTrue();
+        }
+
+        [Test]
+        public void TestToAsyncLazy_Disposable()
+        {
+            var lazy = LazyUtils.ToAsyncLazy(async () => new MemoryStream());
+            (lazy is IDisposable).Should().BeTrue();
+        }
     }
 }
