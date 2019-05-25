@@ -9,7 +9,7 @@ configuration: Release
 build_script:
     - cmd: dotnet build -c Release /m
 test_script:
-    - cmd: dotnet test -c Release /m
+    - cmd: dotnet test -c Release --no-build
 after_test:
     - choco install codecov
     - codecov -f "TestResults/coverage.opencover.xml"
