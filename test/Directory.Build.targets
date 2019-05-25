@@ -3,7 +3,8 @@
   <PropertyGroup>
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>opencover</CoverletOutputFormat>
-    <CoverletOutput>$(MSBuildProjectDirectory)/../../TestResults/</CoverletOutput>
+    <CoverletOutput>$(OutDir)/TestResults/$(AssemblyName)</CoverletOutput>
+    <!--<CoverletOutput>$(MSBuildProjectDirectory)/../../TestResults/$(AssemblyName)</CoverletOutput>-->
   </PropertyGroup>
   
   <ItemGroup>
