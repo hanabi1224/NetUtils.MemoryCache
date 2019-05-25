@@ -176,18 +176,18 @@ namespace NetUtils
             obj.RequireNotNull(nameof(obj));
             parameterName.RequireNotNull(nameof(parameterName));
 
-            var bindingFlags =
+            BindingFlags bindingFlags =
                 BindingFlags.Public |
                 BindingFlags.Instance |
                 BindingFlags.FlattenHierarchy;
             Type t = typeof(T);
-            foreach (var propertyInfo in t.GetProperties(bindingFlags).Where(propertyInfo => !propertyInfo.PropertyType.IsPrimitive))
+            foreach (PropertyInfo propertyInfo in t.GetProperties(bindingFlags).Where(propertyInfo => !propertyInfo.PropertyType.IsPrimitive))
             {
                 var propValue = propertyInfo.GetValue(obj);
                 propValue.RequireNotNull($"{parameterName}.{propertyInfo.Name}");
             }
 
-            foreach (var fieldInfo in t.GetFields(bindingFlags).Where(fieldInfo => !fieldInfo.FieldType.IsPrimitive))
+            foreach (FieldInfo fieldInfo in t.GetFields(bindingFlags).Where(fieldInfo => !fieldInfo.FieldType.IsPrimitive))
             {
                 var propValue = fieldInfo.GetValue(obj);
                 propValue.RequireNotNull($"{parameterName}.{fieldInfo.Name}");

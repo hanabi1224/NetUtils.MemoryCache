@@ -18,7 +18,7 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCreateDeleteInstance()
         {
             var cacheName = Guid.NewGuid().ToString();
-            var cache = MemoryCache.GetNamedInstance(cacheName);
+            ICacheInstance cache = MemoryCache.GetNamedInstance(cacheName);
             cache.Should().NotBeNull();
 
             var isDisposed = false;
