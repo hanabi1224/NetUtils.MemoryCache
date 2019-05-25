@@ -53,34 +53,10 @@ namespace NetUtils
             return strColl;
         }
 
-        public static int RequireCondition(this int value, Func<int, bool> condition, string parameterName, string message)
-        {
-            condition.RequireNotNull(nameof(condition));
-            parameterName.RequireNotNull(nameof(parameterName));
-
-            if (!condition(value))
-            {
-                throw new ArgumentException(message, parameterName);
-            }
-
-            return value;
-        }
-
-        public static void RequireCondition(bool condition, string parameterName, string message)
-        {
-            parameterName.RequireNotNull(nameof(parameterName));
-            parameterName.RequireNotNull(nameof(message));
-
-            if (!condition)
-            {
-                throw new ArgumentException(message, parameterName);
-            }
-        }
-
         public static T RequireCondition<T>(this T obj, Func<T, bool> condition, string parameterName, string message)
         {
             condition.RequireNotNull(nameof(condition));
-            parameterName.RequireNotNull(nameof(parameterName));
+            parameterName.RequireNotNullOrEmpty(nameof(parameterName));
             obj.RequireNotNull(parameterName);
 
             if (!condition(obj))
@@ -111,18 +87,6 @@ namespace NetUtils
             return obj;
         }
 
-        public static float RequireNonNegative(this float value, string parameterName)
-        {
-            parameterName.RequireNotNull(nameof(parameterName));
-
-            if (value < 0)
-            {
-                throw new ArgumentException("Parameter must not be negative.", parameterName);
-            }
-
-            return value;
-        }
-
         public static double RequireNonNegative(this double value, string parameterName)
         {
             parameterName.RequireNotNull(nameof(parameterName));
@@ -135,7 +99,7 @@ namespace NetUtils
             return value;
         }
 
-        public static float RequireNonNegative(this int value, string parameterName)
+        public static int RequireNonNegative(this int value, string parameterName)
         {
             parameterName.RequireNotNull(nameof(parameterName));
 
