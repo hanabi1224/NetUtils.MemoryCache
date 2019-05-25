@@ -1,4 +1,4 @@
-﻿namespace NetUtils.Common.Tests
+﻿namespace NetUtils
 {
     public class DummyDisposable : DisposableBase
     {

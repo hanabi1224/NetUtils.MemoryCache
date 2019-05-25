@@ -77,15 +77,14 @@ namespace NetUtils.MemoryCache.Tests
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey_DisposableAsync));
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
             var key = Guid.NewGuid().ToString();
-            var isDisposed = false;
-            var data = new DummyDisposable(() => { isDisposed = true; });
+            var data = new DummyDisposable();
             cache.SetData(key, data, TimeSpan.MaxValue);
-            isDisposed.Should().BeFalse();
+            data.IsDisposed.Should().BeFalse();
             cache.TryDeleteKey(key).Should().BeTrue();
             cache.TryDeleteKey(key).Should().BeFalse();
-            isDisposed.Should().BeFalse();
+            data.IsDisposed.Should().BeFalse();
             await Task.Delay(TimeSpan.FromMilliseconds(300));
-            isDisposed.Should().BeTrue();
+            data.IsDisposed.Should().BeTrue();
         }
 
         ////[Test]
@@ -109,17 +108,16 @@ namespace NetUtils.MemoryCache.Tests
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey));
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
             var key = Guid.NewGuid().ToString();
-            var isDisposed = false;
-            var data = new DummyDisposable(() => { isDisposed = true; });
+            var data = new DummyDisposable();
             cache.SetData(key, data, TimeSpan.MaxValue);
             cache.Size.Should().Be(1);
-            isDisposed.Should().BeFalse();
+            data.IsDisposed.Should().BeFalse();
             cache.Clear();
             cache.Size.Should().Be(0);
-            isDisposed.Should().BeFalse();
+            data.IsDisposed.Should().BeFalse();
             await Task.Delay(TimeSpan.FromMilliseconds(300));
             cache.CleanIfNeeded();
-            isDisposed.Should().BeTrue();
+            data.IsDisposed.Should().BeTrue();
         }
 
         [Test]
