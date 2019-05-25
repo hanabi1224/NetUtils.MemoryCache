@@ -1,9 +1,9 @@
 ﻿
 using System;
 
-namespace NetUtils.MemoryCache.Utils
+namespace NetUtils
 {
-    public static class RandomUtil
+    public static class RandomUtils
     {
         [ThreadStatic]
         private static Random t_random;

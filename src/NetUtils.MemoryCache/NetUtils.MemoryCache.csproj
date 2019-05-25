@@ -2,39 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;netcoreapp2.1;</TargetFrameworks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Authors>hanabi1224@github.com</Authors>
     <Description>Yet another memory cache library that supports reloading data in background and handle disposable data properly</Description>
-    <Copyright>Copyright (C) 2019 hanabi1224@github.com</Copyright>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
-    <RepositoryType>Git</RepositoryType>
-    <PackageTags>memory cache,cache,MemoryCache</PackageTags>
-    <Version>1.0.0-pre7</Version>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>.pdb;$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-18618-05">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Memory" Version="4.*" Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net45' " />
@@ -47,12 +16,12 @@
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <!--<PackageReference Include="IDisposableAnalyzers" Version="2.*">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>-->
-    <!--<PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>-->
+    <!--<PackageReference Include="IDisposableAnalyzers" Version="2.*"><PrivateAssets>all</PrivateAssets></PackageReference>-->
+    <!--<PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2"><PrivateAssets>all</PrivateAssets></PackageReference>-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetUtils.Common\NetUtils.Common.csproj" />
   </ItemGroup>
 
 </Project>

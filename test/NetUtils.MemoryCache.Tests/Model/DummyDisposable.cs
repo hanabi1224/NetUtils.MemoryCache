@@ -1,5 +1,4 @@
 ﻿using System;
-using NetUtils.MemoryCache.Utils;
 
 namespace NetUtils.MemoryCache.Tests
 {

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
-namespace NetUtils.MemoryCache.Utils
+namespace NetUtils
 {
     public class LazyDisposable<T> : Lazy<T>, IDisposable
     {

@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NetUtils.MemoryCache.Utils;
 using NUnit.Framework;
 
 namespace NetUtils.MemoryCache.Tests
@@ -22,7 +21,7 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCacheFuntionConcurrency(int numberOfConcurrentTasks, bool shouldReloadInBackground)
         {
             var key = Guid.NewGuid().ToString();
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {
@@ -30,7 +29,7 @@ namespace NetUtils.MemoryCache.Tests
                     key,
                     async () =>
                     {
-                        await Task.Delay(RandomUtil.Random.Next(900) + 100).ConfigureAwait(false);
+                        await Task.Delay(RandomUtils.Random.Next(900) + 100).ConfigureAwait(false);
                         Interlocked.Increment(ref counter);
                         return i;
                     },
@@ -54,7 +53,7 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCacheFuntionConcurrencyPerf(int numberOfConcurrentTasks, bool shouldReloadInBackground)
         {
             var key = Guid.NewGuid().ToString();
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {

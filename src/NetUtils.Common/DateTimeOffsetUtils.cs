@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace NetUtils.MemoryCache
+namespace NetUtils
 {
     public static class DateTimeOffsetUtils
     {
@@ -14,7 +14,7 @@ namespace NetUtils.MemoryCache
             catch (ArgumentOutOfRangeException e)
             {
                 Trace.TraceError(e.ToString());
-                return DateTimeOffset.MaxValue;
+                return timeSpan > TimeSpan.Zero ? DateTimeOffset.MaxValue : DateTimeOffset.MinValue;
             }
         }
     }
