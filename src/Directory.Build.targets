@@ -8,7 +8,7 @@
   <PropertyGroup>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <Authors>hanabi1224@github.com</Authors>    
+    <Authors>hanabi1224@github.com</Authors>
     <Copyright>Copyright (C) 2019 hanabi1224@github.com</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
@@ -27,5 +27,16 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>.pdb;$(AllowedOutputExtensionsInPackageBuildOutputFolder)</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.*">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.*">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <!--<PackageReference Include="IDisposableAnalyzers" Version="2.*"><PrivateAssets>all</PrivateAssets></PackageReference>-->
+    <!--<PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2"><PrivateAssets>all</PrivateAssets></PackageReference>-->
+  </ItemGroup>
 
 </Project>
