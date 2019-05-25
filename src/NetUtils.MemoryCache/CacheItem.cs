@@ -23,18 +23,7 @@ namespace NetUtils.MemoryCache
             IsDataEnumerable = Data is IEnumerable;
         }
 
-        public string Key
-        {
-            get
-            {
-                if (_key.TryGetTarget(out var target))
-                {
-                    return target;
-                }
-
-                return null;
-            }
-        }
+        public string Key => _key.TryGetTarget(out var target) ? target : null;
 
         public object Data { get; set; }
 

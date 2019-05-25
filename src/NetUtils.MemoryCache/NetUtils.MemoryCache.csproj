@@ -3,22 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net45;netcoreapp2.1;</TargetFrameworks>
     <Description>Yet another memory cache library that supports reloading data in background and handle disposable data properly</Description>
+    <PackageTags>memory cache,cache,MemoryCache</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="System.Memory" Version="4.*" Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'net45' " />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.*">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.*">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <!--<PackageReference Include="IDisposableAnalyzers" Version="2.*"><PrivateAssets>all</PrivateAssets></PackageReference>-->
-    <!--<PackageReference Include="Dotnet.CodeFormatter.BuildTask.Fork" Version="0.0.2"><PrivateAssets>all</PrivateAssets></PackageReference>-->
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NetUtils.Common\NetUtils.Common.csproj" />

@@ -35,15 +35,17 @@ namespace NetUtils
                 return null;
             }
 
-            if (s_typeIDisposable.IsAssignableFrom(typeof(T))
-                || s_typeIEnumerable.IsAssignableFrom(typeof(T)))
+            return ToLazy(func: () => func.Invoke().ConfigureAwait(false).GetAwaiter().GetResult(), isThreadSafe: isThreadSafe);
+        }
+
+        public static AsyncLazy<T> ToAsyncLazy<T>(this Func<Task<T>> func)
+        {
+            if (func == null)
             {
-                return new LazyDisposable<T>(() => func.Invoke().ConfigureAwait(false).GetAwaiter().GetResult(), isThreadSafe: isThreadSafe);
+                return null;
             }
-            else
-            {
-                return new Lazy<T>(() => func.Invoke().ConfigureAwait(false).GetAwaiter().GetResult(), isThreadSafe: isThreadSafe);
-            }
+
+            return new AsyncLazy<T>(func);
         }
     }
 }

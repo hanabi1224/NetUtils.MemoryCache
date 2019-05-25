@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace NetUtils.MemoryCache.Tests
 {
@@ -13,15 +15,14 @@ namespace NetUtils.MemoryCache.Tests
         {
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
-            var isDisposed = false;
-            var data = new DummyDisposable(() => { isDisposed = true; });
+            var data = new DummyDisposable();
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, data, TimeSpan.MaxValue);
             cache.TryDeleteKey(key).Should().BeTrue();
-            isDisposed.Should().Be(false);
+            data.IsDisposed.Should().Be(false);
             await Task.Delay(cache.CleanInternal.Add(TimeSpan.FromMilliseconds(500)));
             cache.CleanIfNeeded();
-            isDisposed.Should().Be(true);
+            data.IsDisposed.Should().Be(true);
         }
 
         [Test]
@@ -29,15 +30,14 @@ namespace NetUtils.MemoryCache.Tests
         {
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
-            var isDisposed = false;
-            var data = new DummyDisposable(() => { isDisposed = true; });
+            var data = new DummyDisposable();
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, new[] { data }, TimeSpan.MaxValue);
             cache.TryDeleteKey(key).Should().BeTrue();
-            isDisposed.Should().Be(false);
+            data.IsDisposed.Should().Be(false);
             await Task.Delay(cache.CleanInternal.Add(TimeSpan.FromMilliseconds(500)));
             cache.CleanIfNeeded();
-            isDisposed.Should().Be(true);
+            data.IsDisposed.Should().Be(true);
         }
 
         [Test]
@@ -45,16 +45,15 @@ namespace NetUtils.MemoryCache.Tests
         {
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
-            var isDisposed = false;
-            var data = LazyUtils.ToLazy(() => new DummyDisposable(() => { isDisposed = true; }));
+            var data = LazyUtils.ToLazy(() => new DummyDisposable());
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, data, TimeSpan.MaxValue);
             Console.WriteLine(data.Value.GetHashCode());
             cache.TryDeleteKey(key).Should().BeTrue();
-            isDisposed.Should().Be(false);
+            data.Value.IsDisposed.Should().Be(false);
             await Task.Delay(cache.CleanInternal.Add(TimeSpan.FromMilliseconds(500)));
             cache.CleanIfNeeded();
-            isDisposed.Should().Be(true);
+            data.Value.IsDisposed.Should().Be(true);
         }
 
         [Test]
@@ -62,16 +61,15 @@ namespace NetUtils.MemoryCache.Tests
         {
             ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
-            var isDisposed = false;
-            var data = LazyUtils.ToLazy(() => new[] { new DummyDisposable(() => { isDisposed = true; }) });
+            var data = LazyUtils.ToLazy(() => new[] { new DummyDisposable() });
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, data, TimeSpan.MaxValue);
             Console.WriteLine(data.Value.GetHashCode());
             cache.TryDeleteKey(key).Should().BeTrue();
-            isDisposed.Should().Be(false);
+            data.Value.ForEach(_ => _.IsDisposed.Should().Be(false));
             await Task.Delay(cache.CleanInternal.Add(TimeSpan.FromMilliseconds(500)));
             cache.CleanIfNeeded();
-            isDisposed.Should().Be(true);
+            data.Value.ForEach(_ => _.IsDisposed.Should().Be(true));
         }
     }
 }

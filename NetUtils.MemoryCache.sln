@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.28917.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetUtils.MemoryCache", "src\NetUtils.MemoryCache\NetUtils.MemoryCache.csproj", "{4E20858A-5828-4338-8180-49C794401353}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetUtils.MemoryCache.Tests", "test\NetUtils.MemoryCache.Tests\NetUtils.MemoryCache.Tests.csproj", "{698B604D-D73F-4D39-85F0-63B427436E5E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "miscs", "miscs", "{0B07E233-0D8A-4F01-A950-1BD19134D007}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -29,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{69508C34-E
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetUtils.Common", "src\NetUtils.Common\NetUtils.Common.csproj", "{3491FEE4-5543-46CE-B29B-048A05976315}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetUtils.Common.Tests", "test\NetUtils.Common.Tests\NetUtils.Common.Tests.csproj", "{D9D08C02-4333-42EB-9228-29E03CEAF040}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetUtils.Tests", "test\NetUtils.Tests\NetUtils.Tests.csproj", "{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,27 +39,22 @@ Global
 		{4E20858A-5828-4338-8180-49C794401353}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4E20858A-5828-4338-8180-49C794401353}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4E20858A-5828-4338-8180-49C794401353}.Release|Any CPU.Build.0 = Release|Any CPU
-		{698B604D-D73F-4D39-85F0-63B427436E5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{698B604D-D73F-4D39-85F0-63B427436E5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{698B604D-D73F-4D39-85F0-63B427436E5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{698B604D-D73F-4D39-85F0-63B427436E5E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3491FEE4-5543-46CE-B29B-048A05976315}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3491FEE4-5543-46CE-B29B-048A05976315}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3491FEE4-5543-46CE-B29B-048A05976315}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3491FEE4-5543-46CE-B29B-048A05976315}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9D08C02-4333-42EB-9228-29E03CEAF040}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9D08C02-4333-42EB-9228-29E03CEAF040}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9D08C02-4333-42EB-9228-29E03CEAF040}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9D08C02-4333-42EB-9228-29E03CEAF040}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4E20858A-5828-4338-8180-49C794401353} = {5F59A57B-57F1-4ED1-8A6A-2B1DE9159D61}
-		{698B604D-D73F-4D39-85F0-63B427436E5E} = {69508C34-EC82-477F-989F-5A6F04551BEC}
 		{3491FEE4-5543-46CE-B29B-048A05976315} = {5F59A57B-57F1-4ED1-8A6A-2B1DE9159D61}
-		{D9D08C02-4333-42EB-9228-29E03CEAF040} = {69508C34-EC82-477F-989F-5A6F04551BEC}
+		{FF1AF6C6-5014-41CD-9D05-AB21DFF4BA8A} = {69508C34-EC82-477F-989F-5A6F04551BEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {745F1B65-6F27-48C8-BC46-77F69C2E7953}
