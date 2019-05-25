@@ -2,29 +2,22 @@
 using System;
 using System.Collections;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace NetUtils
 {
-    public class LazyDisposable<T> : Lazy<T>, IDisposable
+    public class LazyDisposable<T> : Lazy<T>, IDisposableObservable
     {
-        [ExcludeFromCodeCoverage]
         public LazyDisposable() : base() { }
 
-        [ExcludeFromCodeCoverage]
         public LazyDisposable(bool isThreadSafe) : base(isThreadSafe) { }
 
-        [ExcludeFromCodeCoverage]
         public LazyDisposable(LazyThreadSafetyMode mode) : base(mode) { }
 
-        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory) : base(valueFactory) { }
 
-        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory, bool isThreadSafe) : base(valueFactory, isThreadSafe) { }
 
-        [ExcludeFromCodeCoverage]
         public LazyDisposable(Func<T> valueFactory, LazyThreadSafetyMode mode) : base(valueFactory, mode) { }
 
         ~LazyDisposable()
@@ -32,8 +25,8 @@ namespace NetUtils
             Dispose(false);
         }
 
-        #region IDisposable
-        private bool _isDisposed;
+        #region IDisposableObservable
+        public bool IsDisposed { get; private set; }
 
         public void Dispose()
         {
@@ -43,7 +36,7 @@ namespace NetUtils
 
         protected virtual void Dispose(bool disposing)
         {
-            if (_isDisposed)
+            if (IsDisposed)
             {
                 return;
             }
@@ -53,7 +46,7 @@ namespace NetUtils
                 DisposeResources();
             }
 
-            _isDisposed = true;
+            IsDisposed = true;
         }
 
         protected void DisposeResources()
