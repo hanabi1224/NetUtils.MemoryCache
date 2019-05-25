@@ -13,7 +13,7 @@ test_script:
 after_test:
     - choco install codecov
     - codecov -h
-    - codecov -f 'TestResults/*.opencover.xml'
+    - codecov -f 'TestResults/NetUtils.Tests.opencover.xml'
 artifacts:
     - path: '**\*.nupkg'
       name: nupkg
