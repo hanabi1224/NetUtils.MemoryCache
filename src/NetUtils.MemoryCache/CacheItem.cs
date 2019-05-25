@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Threading;
-using NetUtils.MemoryCache.Utils;
 
 namespace NetUtils.MemoryCache
 {

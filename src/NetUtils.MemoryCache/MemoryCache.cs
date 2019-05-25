@@ -42,7 +42,7 @@ namespace NetUtils.MemoryCache
 
         public static bool TryDeleteNamedInstance(string name)
         {
-            _ = name ?? throw new ArgumentNullException(nameof(name));
+            name.RequireNotNullOrWhiteSpace(nameof(name));
 
             if (s_namedCacheInstances.TryRemove(name, out ICacheInstance cacheInstance))
             {

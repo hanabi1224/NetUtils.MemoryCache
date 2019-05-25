@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NetUtils.MemoryCache.Utils;
 using NUnit.Framework;
 
 namespace NetUtils.MemoryCache.Tests
@@ -12,7 +11,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_DataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = new DummyDisposable(() => { isDisposed = true; });
@@ -28,7 +27,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_CollectionDataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = new DummyDisposable(() => { isDisposed = true; });
@@ -44,7 +43,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_LazyDataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = LazyUtils.ToLazy(() => new DummyDisposable(() => { isDisposed = true; }));
@@ -61,7 +60,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_LazyCollectionDataShouldBeDisposedAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var isDisposed = false;
             var data = LazyUtils.ToLazy(() => new[] { new DummyDisposable(() => { isDisposed = true; }) });

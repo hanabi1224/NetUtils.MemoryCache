@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace NetUtils.MemoryCache.Utils
+namespace NetUtils
 {
     public interface IPerfMonitorScope
     {

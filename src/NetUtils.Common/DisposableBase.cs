@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace NetUtils.MemoryCache.Utils
+namespace NetUtils
 {
     public interface IDisposableObservable : IDisposable
     {

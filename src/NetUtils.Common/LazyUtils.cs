@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Threading.Tasks;
 
-namespace NetUtils.MemoryCache.Utils
+namespace NetUtils
 {
     public static class LazyUtils
     {

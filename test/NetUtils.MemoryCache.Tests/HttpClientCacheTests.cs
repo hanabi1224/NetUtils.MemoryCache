@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NetUtils.MemoryCache.Utils;
 using NUnit.Framework;
 
 namespace NetUtils.MemoryCache.Tests
@@ -18,7 +17,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task HttpGetETagCacheTestsAsync()
         {
-            var cache = MemoryCache.GetNamedInstance(nameof(HttpGetETagCacheTestsAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(HttpGetETagCacheTestsAsync));
             using (var client = new HttpClient())
             {
                 var baseUrl = $"https://httpbin.org/etag/";
