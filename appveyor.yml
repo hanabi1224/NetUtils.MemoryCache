@@ -12,7 +12,8 @@ test_script:
     - cmd: dotnet test -c Release --no-build
 after_test:
     - choco install codecov
-    - codecov -f "TestResults/coverage.opencover.xml"
+    - codecov -h
+    - codecov -f "TestResults\NetUtils.Tests.opencover.xml"
 artifacts:
     - path: '**\*.nupkg'
       name: nupkg
