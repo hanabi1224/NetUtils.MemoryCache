@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace NetUtils.MemoryCache.Tests
 {
+    [CustomRetry]
     [TestFixture]
     public class ExtensionMethodTests
     {
