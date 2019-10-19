@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -33,6 +34,17 @@ namespace NetUtils.MemoryCache
         {
             _ = name ?? throw new ArgumentNullException(nameof(name));
 
+            ICacheInstance result = s_namedCacheInstances.GetOrAdd(
+                name,
+                key => new MemoryCacheInstance(name));
+
+            return result;
+        }
+
+        public static ICacheInstance GetCurrentClassNamedCacheInstance()
+        {
+            var callingMethod = new StackTrace().GetFrame(1).GetMethod();
+            var name = callingMethod.DeclaringType.FullName;
             ICacheInstance result = s_namedCacheInstances.GetOrAdd(
                 name,
                 key => new MemoryCacheInstance(name));

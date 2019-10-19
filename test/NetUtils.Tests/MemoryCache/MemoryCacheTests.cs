@@ -15,6 +15,13 @@ namespace NetUtils.MemoryCache.Tests
         }
 
         [Test]
+        public void TestGetCurrentClassNamedCache()
+        {
+            var cache = MemoryCache.GetCurrentClassNamedCacheInstance();
+            cache.Name.Should().Be(GetType().FullName);
+        }
+
+        [Test]
         public void TestCreateDeleteInstance()
         {
             var cacheName = Guid.NewGuid().ToString();

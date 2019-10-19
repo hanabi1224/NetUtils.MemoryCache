@@ -27,6 +27,16 @@ namespace NetUtils
             return obj.RequireCondition(l => l?.Any() == true, parameterName, "Collection cannot be null or empty");
         }
 
+        public static string RequireNotNullOrEmpty(this string obj, string parameterName)
+        {
+            if (string.IsNullOrEmpty(obj))
+            {
+                throw new ArgumentException("Parameter must not be null or empty.", parameterName);
+            }
+
+            return obj;
+        }
+
         public static IEnumerable<T> RequireNotNullItems<T>(this IEnumerable<T> obj, string parameterName)
         {
             obj.RequireNotNull(nameof(obj));
@@ -62,16 +72,6 @@ namespace NetUtils
             if (!condition(obj))
             {
                 throw new ArgumentException(message, parameterName);
-            }
-
-            return obj;
-        }
-
-        public static string RequireNotNullOrEmpty(this string obj, string parameterName)
-        {
-            if (string.IsNullOrEmpty(obj))
-            {
-                throw new ArgumentException("Parameter must not be null or empty.", parameterName);
             }
 
             return obj;
