@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019
 pull_requests:
     do_not_increment_build_number: true
 branches:
@@ -12,8 +12,8 @@ test_script:
     - cmd: dotnet test -c Release --no-build
 after_test:
     - choco install codecov
-    - codecov -h
-    - codecov -f "TestResults\NetUtils.Tests.opencover.xml"
+    - codecov --help
+    - codecov -f "TestResults\*.opencover.xml"
 artifacts:
     - path: '**\*.nupkg'
       name: nupkg
@@ -24,4 +24,7 @@ nuget:
 deploy:
     provider: NuGet
     api_key:
-        secure: nNWiXk+ZiOOh5sHV/C9Z9pqZ8GFpaQFqAR/P0/t09h81Ppx3xed6VsWd4w7FMn2R
+        secure: rE/5DvmyqGe9RdSRHDF7HF0MZoQzhb84P9cipIK8uY4TPf1Fix+67biwICQ4qHDB
+    on:
+        branch: master
+        #appveyor_repo_tag: true
