@@ -20,7 +20,7 @@ namespace NetUtils.MemoryCache.Tests
             dataRef.Should().NotBeNull();
             dataRef.Should().Be(data);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(101));
+            await Task.Delay(TimeSpan.FromMilliseconds(105));
 
             cache.GetData<(int, int, int)>(key).Should().Be(default((int, int, int)));
         }
@@ -56,7 +56,7 @@ namespace NetUtils.MemoryCache.Tests
             cache.SetData(key, data, TimeSpan.FromMilliseconds(100));
             cache.GetData(key).Should().NotBeNull();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(101));
+            await Task.Delay(TimeSpan.FromMilliseconds(105));
 
             cache.GetData(key).Should().BeNull();
         }
