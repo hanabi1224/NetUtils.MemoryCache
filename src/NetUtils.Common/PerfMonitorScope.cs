@@ -15,9 +15,9 @@ namespace NetUtils
     public class PerfMonitorScope : DisposableBase, IPerfMonitorScope
     {
         private readonly Stopwatch _stopwatch;
-        private readonly Action<Stopwatch> _onExit;
+        private readonly Action<Stopwatch>? _onExit;
 
-        public PerfMonitorScope(Action<Stopwatch> onExit = null)
+        public PerfMonitorScope(Action<Stopwatch>? onExit = null)
         {
             StartTime = DateTimeOffset.Now;
             _stopwatch = Stopwatch.StartNew();

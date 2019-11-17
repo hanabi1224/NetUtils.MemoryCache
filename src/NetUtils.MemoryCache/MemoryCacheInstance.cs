@@ -139,7 +139,7 @@ namespace NetUtils.MemoryCache
             bool shouldWaitForLock)
         {
             object tmpLock = null;
-            object lockToWait = null;
+            object lockToWait;
             if (oldCacheItem == null)
             {
                 lockToWait = tmpLock = _keyTmpLockMappings.GetOrAdd(key, new object());
@@ -219,11 +219,11 @@ namespace NetUtils.MemoryCache
                 catch (InvalidCastException e)
                 {
                     Trace.TraceError(e.ToString());
-                    return default(T);
+                    return default;
                 }
             }
 
-            return default(T);
+            return default;
         }
 
         public object GetData(string key)
@@ -253,7 +253,7 @@ namespace NetUtils.MemoryCache
             return false;
         }
 
-        public void SetData(string key, object data, TimeSpan timeToLive, string eTag = null)
+        public void SetData(string key, object data, TimeSpan timeToLive, string eTag = "")
         {
             AddOrUpdate(key, data, timeToLive, eTag);
         }

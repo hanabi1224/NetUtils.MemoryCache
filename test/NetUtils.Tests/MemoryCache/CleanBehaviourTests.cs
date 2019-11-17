@@ -13,7 +13,7 @@ namespace NetUtils.MemoryCache.Tests
         [TestCase(false)]
         public async Task TestCacheCleanBehaviourAsync(bool shouldReloadInBackground)
         {
-            var cacheName = $"{nameof(TestCacheCleanBehaviourAsync)}|{shouldReloadInBackground}";
+            var cacheName = Guid.NewGuid().ToString();
             ICacheInstance cache = MemoryCache.GetNamedInstance(cacheName);
 
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);

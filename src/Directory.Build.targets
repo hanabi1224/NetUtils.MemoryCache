@@ -13,7 +13,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/hanabi1224/NetUtils.MemoryCache</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>    
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -28,7 +28,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SonarAnalyzer.CSharp" Version="7.*">
+    <PackageReference Include="SonarAnalyzer.CSharp" Version="8.*">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="16.*">

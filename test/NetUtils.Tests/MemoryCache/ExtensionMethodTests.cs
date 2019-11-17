@@ -11,7 +11,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestGetData_GenericAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_GenericAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);
@@ -28,7 +28,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestGetData_Generic_InvalidCast()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_Generic_InvalidCast));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);
@@ -49,7 +49,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestGetData_NonGenericAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_NonGenericAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);

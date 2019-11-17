@@ -17,7 +17,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task HttpGetETagCacheTestsAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(HttpGetETagCacheTestsAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             using (var client = new HttpClient())
             {
                 var baseUrl = $"https://httpbin.org/etag/";

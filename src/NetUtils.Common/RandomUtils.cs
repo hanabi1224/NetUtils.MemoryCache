@@ -6,7 +6,7 @@ namespace NetUtils
     public static class RandomUtils
     {
         [ThreadStatic]
-        private static Random t_random;
+        private static Random? t_random;
         public static Random Random
         {
             get
