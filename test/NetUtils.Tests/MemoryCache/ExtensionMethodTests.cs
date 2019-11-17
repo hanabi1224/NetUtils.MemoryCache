@@ -20,9 +20,9 @@ namespace NetUtils.MemoryCache.Tests
             dataRef.Should().NotBeNull();
             dataRef.Should().Be(data);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(105));
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
 
-            cache.GetData<(int, int, int)>(key).Should().Be(default((int, int, int)));
+            cache.GetData<(int, int, int)>(key).Should().Be(default);
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace NetUtils.MemoryCache.Tests
             dataRef.Should().Be(data);
 
             var dataRefInvalid = cache.GetData<string>(key);
-            dataRefInvalid.Should().Be(default(string));
+            dataRefInvalid.Should().Be(default);
 
             dataRef = cache.GetData<(int, int, int)>(key);
             dataRef.Should().NotBeNull();
@@ -56,7 +56,7 @@ namespace NetUtils.MemoryCache.Tests
             cache.SetData(key, data, TimeSpan.FromMilliseconds(100));
             cache.GetData(key).Should().NotBeNull();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(105));
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
 
             cache.GetData(key).Should().BeNull();
         }
