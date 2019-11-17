@@ -11,7 +11,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestGetData_GenericAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_GenericAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);
@@ -20,15 +20,15 @@ namespace NetUtils.MemoryCache.Tests
             dataRef.Should().NotBeNull();
             dataRef.Should().Be(data);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(105));
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
 
-            cache.GetData<(int, int, int)>(key).Should().Be(default((int, int, int)));
+            cache.GetData<(int, int, int)>(key).Should().Be(default);
         }
 
         [Test]
         public void TestGetData_Generic_InvalidCast()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_Generic_InvalidCast));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);
@@ -39,7 +39,7 @@ namespace NetUtils.MemoryCache.Tests
             dataRef.Should().Be(data);
 
             var dataRefInvalid = cache.GetData<string>(key);
-            dataRefInvalid.Should().Be(default(string));
+            dataRefInvalid.Should().Be(default);
 
             dataRef = cache.GetData<(int, int, int)>(key);
             dataRef.Should().NotBeNull();
@@ -49,14 +49,14 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestGetData_NonGenericAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetData_NonGenericAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
 
             (int, int, int) data = (1, 2, 3);
             cache.SetData(key, data, TimeSpan.FromMilliseconds(100));
             cache.GetData(key).Should().NotBeNull();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(105));
+            await Task.Delay(TimeSpan.FromMilliseconds(200));
 
             cache.GetData(key).Should().BeNull();
         }

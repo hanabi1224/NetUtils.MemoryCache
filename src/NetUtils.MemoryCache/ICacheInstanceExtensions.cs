@@ -17,7 +17,7 @@ namespace NetUtils.MemoryCache
             return cache.GetAutoReloadDataWithCache<T>(
                 key: key,
                 dataFactory: dataFactory,
-                eTagFactory: null,
+                eTagFactory: () => string.Empty,
                 timeToLive: timeToLive,
                 dataUpdateDetectInternal: dataReloadInternal,
                 eTag: out _,
@@ -35,7 +35,7 @@ namespace NetUtils.MemoryCache
             return cache.GetAutoReloadDataWithCache<T>(
                 key: key,
                 dataFactory: dataFactory,
-                eTagFactory: null,
+                eTagFactory: () => Task.FromResult(string.Empty),
                 timeToLive: timeToLive,
                 dataUpdateDetectInternal: dataReloadInternal,
                 eTag: out _,
@@ -53,7 +53,7 @@ namespace NetUtils.MemoryCache
             bool shouldReloadInBackground = true)
         {
             Func<T> df = () => dataFactory().ConfigureAwait(false).GetAwaiter().GetResult();
-            Func<string> ef = () => eTagFactory?.Invoke().ConfigureAwait(false).GetAwaiter().GetResult();
+            Func<string> ef = () => eTagFactory?.Invoke().ConfigureAwait(false).GetAwaiter().GetResult() ?? string.Empty;
             return cache.GetAutoReloadDataWithCache<T>(
                 key: key,
                 dataFactory: df,

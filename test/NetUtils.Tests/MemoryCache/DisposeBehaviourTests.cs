@@ -13,7 +13,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_DataShouldBeDisposedAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var data = new DummyDisposable();
             var key = Guid.NewGuid().ToString();
@@ -28,7 +28,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_CollectionDataShouldBeDisposedAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_DataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var data = new DummyDisposable();
             var key = Guid.NewGuid().ToString();
@@ -43,7 +43,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_LazyDataShouldBeDisposedAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var data = LazyUtils.ToLazy(() => new DummyDisposable());
             var key = Guid.NewGuid().ToString();
@@ -59,7 +59,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestCacheDelete_LazyCollectionDataShouldBeDisposedAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheDelete_LazyDataShouldBeDisposedAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromSeconds(1);
             var data = LazyUtils.ToLazy(() => new[] { new DummyDisposable() });
             var key = Guid.NewGuid().ToString();

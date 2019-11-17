@@ -5,6 +5,7 @@
     <RootNamespace>NetUtils</RootNamespace>
     <Description>Some common dotnet helper / extension methods</Description>
     <PackageTags>utility,helper,extension methods</PackageTags>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

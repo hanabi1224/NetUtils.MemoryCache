@@ -20,7 +20,7 @@ namespace NetUtils.MemoryCache
             out string eTag,
             bool shouldReloadInBackground = true);
 
-        void SetData(string key, object data, TimeSpan timeToLive, string eTag = null);
+        void SetData(string key, object data, TimeSpan timeToLive, string eTag = "");
 
         bool TryDeleteKey(string key);
 

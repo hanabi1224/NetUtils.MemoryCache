@@ -7,7 +7,7 @@ namespace NetUtils
     public class TempFile : DisposableBase
     {
         private const string FolderName = ".tempfiles";
-        public static string TempFilesFolder { get; private set; }
+        public static string TempFilesFolder { get; private set; } = string.Empty;
 
         static TempFile()
         {
@@ -48,14 +48,14 @@ namespace NetUtils
         }
 
         public TempFile(
-            string fileExtension = null)
+            string fileExtension = "")
             : this(new byte[0], fileExtension)
         {
         }
 
         public TempFile(
             ReadOnlyMemory<byte> bytes,
-            string fileExtension = null)
+            string fileExtension = "")
         {
             var normalizedExtension = string.IsNullOrEmpty(fileExtension) ? string.Empty : $".{fileExtension.TrimStart('.')}";
             FullPath = Path.Combine(TempFilesFolder, $"{Path.GetRandomFileName()}{normalizedExtension}");

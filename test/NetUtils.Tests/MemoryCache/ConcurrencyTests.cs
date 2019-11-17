@@ -21,7 +21,7 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCacheFuntionConcurrency(int numberOfConcurrentTasks, bool shouldReloadInBackground)
         {
             var key = Guid.NewGuid().ToString();
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {
@@ -53,7 +53,7 @@ namespace NetUtils.MemoryCache.Tests
         public void TestCacheFuntionConcurrencyPerf(int numberOfConcurrentTasks, bool shouldReloadInBackground)
         {
             var key = Guid.NewGuid().ToString();
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestCacheFuntionConcurrency));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var counter = 0;
             Parallel.For(0, numberOfConcurrentTasks, i =>
             {

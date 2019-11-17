@@ -12,7 +12,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestGetAutoReloadDataWithInterval_SetDataOnException()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetAutoReloadDataWithInterval_SetDataOnException));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             var obj = cache.GetAutoReloadDataWithInterval(key, () => new object(), TimeSpan.MaxValue, TimeSpan.MaxValue);
             obj.Should().NotBeNull();
@@ -25,7 +25,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestGetAutoReloadDataWithInterval_SetAsyncDataOnException()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetAutoReloadDataWithInterval_SetAsyncDataOnException));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             var obj = cache.GetAutoReloadDataWithInterval(key, async () => new object(), TimeSpan.MaxValue, TimeSpan.MaxValue);
             obj.Should().NotBeNull();
@@ -38,7 +38,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestGetAutoReloadDataWithCache_SetDataOnException()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetAutoReloadDataWithInterval_SetDataOnException));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             var obj = cache.GetAutoReloadDataWithCache(key, () => new object(), () => key, TimeSpan.MaxValue, TimeSpan.MaxValue);
             obj.Should().NotBeNull();
@@ -51,7 +51,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestGetAutoReloadDataWithCache_SetAsyncDataOnException()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestGetAutoReloadDataWithInterval_SetAsyncDataOnException));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             var obj = cache.GetAutoReloadDataWithCache(key, async () => new object(), async () => key, TimeSpan.MaxValue, TimeSpan.MaxValue);
             obj.Should().NotBeNull();
@@ -64,7 +64,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public void TestDeleteKey()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             cache.SetData(key, new object(), TimeSpan.MaxValue);
             cache.TryDeleteKey(key).Should().BeTrue();
@@ -74,7 +74,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestDeleteKey_DisposableAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey_DisposableAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
             var key = Guid.NewGuid().ToString();
             var data = new DummyDisposable();
@@ -90,7 +90,7 @@ namespace NetUtils.MemoryCache.Tests
         ////[Test]
         ////public void TestDeleteKey_Disposable_NoDelay()
         ////{
-        ////    var cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey_Disposable_NoDelay));
+        ////    var cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
         ////    cache.CleanInternal = TimeSpan.FromMilliseconds(0);
         ////    var key = Guid.NewGuid().ToString();
         ////    var isDisposed = false;
@@ -105,7 +105,7 @@ namespace NetUtils.MemoryCache.Tests
         [Test]
         public async Task TestClearAsync()
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestDeleteKey));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             cache.CleanInternal = TimeSpan.FromMilliseconds(200);
             var key = Guid.NewGuid().ToString();
             var data = new DummyDisposable();
@@ -125,7 +125,7 @@ namespace NetUtils.MemoryCache.Tests
         [TestCase(false)]
         public async Task TestAutoReloadOnExceptionAsync(bool shouldReloadInBackground)
         {
-            ICacheInstance cache = MemoryCache.GetNamedInstance(nameof(TestAutoReloadOnExceptionAsync));
+            ICacheInstance cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
             var key = Guid.NewGuid().ToString();
             var data = cache.GetAutoReloadDataWithInterval(key, () => 8, TimeSpan.MaxValue, TimeSpan.FromMilliseconds(100), shouldReloadInBackground: shouldReloadInBackground);
             data.Should().Be(8);
@@ -183,7 +183,7 @@ namespace NetUtils.MemoryCache.Tests
         ////[TestCase(false)]
         ////public async Task TestGetDataOrCreate(bool shouldReloadInBackground)
         ////{
-        ////    var cache = MemoryCache.GetNamedInstance(nameof(TestGetDataOrCreate));
+        ////    var cache = MemoryCache.GetNamedInstance(Guid.NewGuid().ToString());
         ////    var key = Guid.NewGuid().ToString();
         ////    var data = cache.GetAutoReloadDataWithInterval(key, () => 8, TimeSpan.MaxValue, shouldReloadInBackground: shouldReloadInBackground);
         ////    data.Should().Be(8);

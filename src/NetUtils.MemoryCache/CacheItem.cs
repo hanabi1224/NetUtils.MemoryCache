@@ -23,7 +23,7 @@ namespace NetUtils.MemoryCache
             IsDataEnumerable = Data is IEnumerable;
         }
 
-        public string Key => _key.TryGetTarget(out var target) ? target : null;
+        public string Key => _key.TryGetTarget(out var target) ? target : string.Empty;
 
         public object Data { get; set; }
 
@@ -65,7 +65,7 @@ namespace NetUtils.MemoryCache
 
         public bool IsUpdateNeeded(string newETag)
         {
-            return !(ETag == newETag && newETag != null);
+            return !(ETag == newETag && !string.IsNullOrEmpty(newETag));
         }
 
         public bool IsUpdateNeeded(Lazy<string> newETagFactory, TimeSpan dataUpdateDetectInternal)
@@ -83,7 +83,7 @@ namespace NetUtils.MemoryCache
                 }
 
                 LastETagCheckUtc = DateTimeOffset.UtcNow;
-                return IsUpdateNeeded(newETagFactory?.Value);
+                return IsUpdateNeeded(newETagFactory?.Value ?? string.Empty);
             }
             catch (Exception e)
             {
